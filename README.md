@@ -62,7 +62,7 @@ Just install causalgraph via pip running the following command:
 pip install causalgraph
 ```
 
-<!-- LOCAL SRC -->
+<!-- LOCAL SOURCE CODE -->
 ### Local source code
 
 1. Clone the repo
