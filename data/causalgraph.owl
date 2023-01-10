@@ -1,0 +1,530 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://iwu.fraunhofer.de/causalgraph"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://iwu.fraunhofer.de/causalgraph">
+    <Prefix name="" IRI="http://iwu.fraunhofer.de/causalgraph"/>
+    <Prefix name="cg" IRI="http://iwu.fraunhofer.de/causalgraph#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <Literal xml:lang="en">Causalgraph-ontology with basic concepts for CausalNodes and CausalEdges. Part of PyPi Package at https://pypi.org/project/causalgraph/</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <Literal xml:lang="en">causalgraph-ontology</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
+        <Literal xml:lang="en">0.1.2</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="#CausalEdge"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CausalGraph"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CausalNode"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Creator"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Event"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HumanInput_Event"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HumanInput_State"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HumanInput_Variable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Human_Creator"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Importer_Creator"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LearningAlgorithm_Creator"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Machine_Creator"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Machine_Event"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Machine_State"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Machine_Variable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#State"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Variable"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#created"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasCause"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasComponent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasCreator"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasEffect"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isAffectedBy"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isCausing"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasConfidence"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasTimeLag"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="#CausalGraph"/>
+        <ObjectIntersectionOf>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="#hasComponent"/>
+                <Class IRI="#CausalEdge"/>
+            </ObjectSomeValuesFrom>
+            <ObjectSomeValuesFrom>
+                <ObjectProperty IRI="#hasComponent"/>
+                <Class IRI="#CausalNode"/>
+            </ObjectSomeValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="#Event"/>
+        <Class IRI="#CausalNode"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HumanInput_Event"/>
+        <Class IRI="#Event"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HumanInput_State"/>
+        <Class IRI="#State"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#HumanInput_Variable"/>
+        <Class IRI="#Variable"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Human_Creator"/>
+        <Class IRI="#Creator"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Importer_Creator"/>
+        <Class IRI="#Machine_Creator"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LearningAlgorithm_Creator"/>
+        <Class IRI="#Machine_Creator"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Machine_Creator"/>
+        <Class IRI="#Creator"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Machine_Event"/>
+        <Class IRI="#Event"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Machine_State"/>
+        <Class IRI="#State"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Machine_Variable"/>
+        <Class IRI="#Variable"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#State"/>
+        <Class IRI="#CausalNode"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Variable"/>
+        <Class IRI="#CausalNode"/>
+    </SubClassOf>
+    <DisjointClasses>
+        <Class IRI="#CausalEdge"/>
+        <Class IRI="#CausalNode"/>
+    </DisjointClasses>
+    <DisjointClasses>
+        <Class IRI="#Event"/>
+        <Class IRI="#State"/>
+        <Class IRI="#Variable"/>
+    </DisjointClasses>
+    <DisjointClasses>
+        <Class IRI="#Human_Creator"/>
+        <Class IRI="#Machine_Creator"/>
+    </DisjointClasses>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#created"/>
+        <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+        <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasCause"/>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasCreator"/>
+        <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasEffect"/>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#isAffectedBy"/>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#isCausing"/>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+    </SubObjectPropertyOf>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#created"/>
+        <ObjectProperty IRI="#hasCreator"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#hasCause"/>
+        <ObjectProperty IRI="#isCausing"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#hasEffect"/>
+        <ObjectProperty IRI="#isAffectedBy"/>
+    </InverseObjectProperties>
+    <SymmetricObjectProperty>
+        <ObjectProperty IRI="#hasCausalConnection"/>
+    </SymmetricObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#created"/>
+        <Class IRI="#Creator"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasCause"/>
+        <Class IRI="#CausalEdge"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasCreator"/>
+        <Class IRI="#CausalEdge"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasCreator"/>
+        <Class IRI="#CausalNode"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasEffect"/>
+        <Class IRI="#CausalEdge"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#isAffectedBy"/>
+        <Class IRI="#CausalNode"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#isCausing"/>
+        <Class IRI="#CausalNode"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#created"/>
+        <Class IRI="#CausalEdge"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#created"/>
+        <Class IRI="#CausalNode"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasCause"/>
+        <Class IRI="#CausalNode"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasCreator"/>
+        <Class IRI="#Creator"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasEffect"/>
+        <Class IRI="#CausalNode"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#isAffectedBy"/>
+        <Class IRI="#CausalEdge"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#isCausing"/>
+        <Class IRI="#CausalEdge"/>
+    </ObjectPropertyRange>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#hasConfidence"/>
+        <DataProperty abbreviatedIRI="owl:topDataProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#hasTimeLag"/>
+        <DataProperty abbreviatedIRI="owl:topDataProperty"/>
+    </SubDataPropertyOf>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#hasConfidence"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#hasTimeLag"/>
+    </FunctionalDataProperty>
+    <DataPropertyDomain>
+        <DataProperty IRI="#hasConfidence"/>
+        <Class IRI="#CausalEdge"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#hasTimeLag"/>
+        <Class IRI="#CausalEdge"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasConfidence"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <Annotation>
+            <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+            <Literal xml:lang="en">Confidence only allows values between 0.0 and 1.0.</Literal>
+        </Annotation>
+        <DataProperty IRI="#hasConfidence"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:double"/>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#double">0.0</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#maxInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#double">1.0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasTimeLag"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasTimeLag"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:double"/>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#double">0.0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DisjointDataProperties>
+        <DataProperty IRI="#hasConfidence"/>
+        <DataProperty IRI="#hasTimeLag"/>
+    </DisjointDataProperties>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#CausalEdge</IRI>
+        <Literal xml:lang="en">Causal Edges connect two Causal Nodes and contain information about the causal direction, as well as properties describing the nature of the causal connection.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#CausalEdge</IRI>
+        <Literal xml:lang="en">CausalEdge</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#CausalGraph</IRI>
+        <Literal xml:lang="en">Causal Graphs consist of Causal Edges and Causal Nodes. 
+In future releases the graph will be further classified into Causal Graphical Models (CGM) or Structural Causal Model (SCM), depending on the information attaches to its nodes. If it falls in between, as not all Causal Edges contain Structural Equations, it is called Hybrid Causal Model (HCM).</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#CausalGraph</IRI>
+        <Literal xml:lang="en">CausalGraph</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#CausalNode</IRI>
+        <Literal xml:lang="en">A Causal Node refers to an information-carrying Node in the Causal Graph. The information can be of different types (e.g., Event, State, (Continous) Variable) and origins (created by Human or Machine).</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#CausalNode</IRI>
+        <Literal xml:lang="en">CausalNode</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Creator</IRI>
+        <Literal xml:lang="en">The Creator of the causal individual. The creation can either be a manual process, which instantiates individuals, or software-based learning from data sources.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Creator</IRI>
+        <Literal xml:lang="en">Creator</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Event</IRI>
+        <Literal xml:lang="en">Defines a CausalNode of with an event-like Signal Type.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Event</IRI>
+        <Literal xml:lang="en">Event</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#HumanInput_Event</IRI>
+        <Literal xml:lang="en">An Event indicated by a Human.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#HumanInput_Event</IRI>
+        <Literal xml:lang="en">HumanInput Event</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#HumanInput_State</IRI>
+        <Literal xml:lang="en">A state derived by a Human as a &apos;sensor&apos;.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#HumanInput_State</IRI>
+        <Literal xml:lang="en">HumanInput State</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#HumanInput_Variable</IRI>
+        <Literal xml:lang="en">A variable whose values are manually updated by a Human.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#HumanInput_Variable</IRI>
+        <Literal xml:lang="en">HumanInput Variable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Human_Creator</IRI>
+        <Literal xml:lang="en">The Creator of the causal individual, being a human, manually added the causal individual.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Human_Creator</IRI>
+        <Literal xml:lang="en">Human Creator</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Importer_Creator</IRI>
+        <Literal xml:lang="en">The Creator of the causal individual, being an import algorithm, which programmatically creates the causal individual based on a preexisting knowledge base, e.g. a causal graph in a different format.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Importer_Creator</IRI>
+        <Literal xml:lang="en">Importer Creator</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#LearningAlgorithm_Creator</IRI>
+        <Literal xml:lang="en">The Creator of the causal individual, being a learning-algorithm, which programmatically creates the causal individual based on data.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#LearningAlgorithm_Creator</IRI>
+        <Literal xml:lang="en">Learning Algorithm Creator</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Machine_Creator</IRI>
+        <Literal xml:lang="en">The Creator of the causal individual, being a software artifact, which programmatically created the causal individual.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Machine_Creator</IRI>
+        <Literal xml:lang="en">Machine Creator</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Machine_Event</IRI>
+        <Literal xml:lang="en">An Event generated automatically by a Machine or a software artefact.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Machine_Event</IRI>
+        <Literal xml:lang="en">Machine Event</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Machine_State</IRI>
+        <Literal xml:lang="en">A state-signal controlled and indicated by a machine or software artefact.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Machine_State</IRI>
+        <Literal xml:lang="en">Machine State</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Machine_Variable</IRI>
+        <Literal xml:lang="en">A variable whose values are automatically updated by a digital sensor.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Machine_Variable</IRI>
+        <Literal xml:lang="en">Machine Variable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#State</IRI>
+        <Literal xml:lang="en">Defines a CausalNode with an state-like signal Type. State-like means, that the signal is shifting between discrete states. These can be binary states (for example 1/0; on/off) or signals with more than two states (for example high, mid, low).</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#State</IRI>
+        <Literal xml:lang="en">State</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Variable</IRI>
+        <Literal xml:lang="en">Defines a CausalNode with a signal representing a variable. The variable should be continuous in values. Therefore a variable is neither an Event nor a State.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Variable</IRI>
+        <Literal xml:lang="en">Variable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasConfidence</IRI>
+        <Literal xml:lang="en">Functional property of a CausalEdge. Measures the Creator&apos;s confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge&apos;s existence, while 0.0 means that this particular edge is not present.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasTimeLag</IRI>
+        <Literal xml:lang="en">Functional property of a CausalEdge. Measures in SECONDS,  the time lag between cause and the effect to take place. Only positive values are allowed, which means that the effect always occurs after the effect.</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
