@@ -54,6 +54,7 @@ causalgraph - modeling and saving causal graphs embedded in knowledge graphs. Th
 
 You can either use the causalgraph source code directly, or install the python package using pip.
 
+<!-- PIP -->
 ### Using pip
 Just install causalgraph via pip running the following command:
 
@@ -61,6 +62,7 @@ Just install causalgraph via pip running the following command:
 pip install causalgraph
 ```
 
+<!-- LOCAL SRC -->
 ### Local source code
 
 1. Clone the repo
