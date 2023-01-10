@@ -1,7 +1,7 @@
 
 <!-- PROJECT SHIELDS -->
 [![IWU][iwu-shield]](https://www.iwu.fraunhofer.de/)
-[![Tests][pytest-shield]](https://github.com/svenpieper/causalgraph_t/actions)
+[![Tests][pytest-shield]](https://github.com/causalgraph/causalgraph/actions)
 [![License][mit-licence]](https://opensource.org/licenses/MIT)
 [![PyPi][pypi-version]](https://pypi.org/project/causalgraph)
 [![Python][python-version]](https://pypi.org/project/causalgraph)
@@ -32,28 +32,19 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
+    <li><a href="#about-the-project">About the Project</a></li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#similar-projects">Similar Projects</a></li>
   </ol>
 </details>
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About the Project
 
 causalgraph - modeling and saving causal graphs embedded in knowledge graphs. The package has been designed to provide an interface between causal disciplines such as causal discovery and causal inference. With this package, users can create and save causal graphs and export the generated graphs for use in other graph-based packages. The main advantage of the proposed package is its ability to facilitate the linking of additional information and metadata to causal structures. In addition, the package offers a variety of functions for graph modeling and plotting, such as editing, adding, and deleting nodes and edges. It is also compatible with widely used graph data science libraries such as [NetworkX](https://github.com/networkx/networkx) and [Tigramite](https://github.com/jakobrunge/tigramite) and incorporates a specially developed causalgraph ontology in the background. 
 
