@@ -118,6 +118,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 The development of causalgraph is part of the research project KausaLAssist. It is funded by the German Federal Ministry of Education and Research (BMBF) within the "Future of Value Creation - Research on Production, Services and Work" program (funding number 02P20A150) and managed by the Project Management Agency Karlsruhe (PTKA). The authors are responsible for the content of this publication.
 
 
+<!-- SIMILAR PROJECTS -->
 ## Similar Projects
 
 - [owlready2](https://owlready2.readthedocs.io/en/v0.35/) - Makes Ontologies and Knowledge Graphs workable in python. Is used for storing information
