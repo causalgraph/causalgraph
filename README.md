@@ -1,5 +1,4 @@
 
-
 <!-- PROJECT SHIELDS -->
 [![IWU][iwu-shield]](https://www.iwu.fraunhofer.de/)
 [![Tests][pytest-shield]](https://github.com/svenpieper/causalgraph_t/actions)
@@ -58,8 +57,6 @@
 
 causalgraph - modeling and saving causal graphs embedded in knowledge graphs. The package has been designed to provide an interface between causal disciplines such as causal discovery and causal inference. With this package, users can create and save causal graphs and export the generated graphs for use in other graph-based packages. The main advantage of the proposed package is its ability to facilitate the linking of additional information and metadata to causal structures. In addition, the package offers a variety of functions for graph modeling and plotting, such as editing, adding, and deleting nodes and edges. It is also compatible with widely used graph data science libraries such as [NetworkX](https://github.com/networkx/networkx) and [Tigramite](https://github.com/jakobrunge/tigramite) and incorporates a specially developed causalgraph ontology in the background. 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -90,15 +87,56 @@ pip install causalgraph
     ```
 
 
+<!-- USAGE EXAMPLES -->
+## Usage
+
+Please have a look at the examples folder at [/examples](./examples). Here you can find some Jupter notebooks in which the most important functions are presented. You can also take a look at the causalgraph paper. It is referenced in the end of this README.
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+
+<!-- CONTACT -->
+## Contact
+
+- Mail: causalgraph@iwu.fraunhofer.de
+- Blog: [https://www.kognitive-produktion.de/?p=3154](https://www.kognitive-produktion.de/?p=3154)
+- Project Link: [https://github.com/causalgraph](https://github.com/causalgraph)
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+The development of causalgraph is part of the research project KausaLAssist. It is funded by the German Federal Ministry of Education and Research (BMBF) within the "Future of Value Creation - Research on Production, Services and Work" program (funding number 02P20A150) and managed by the Project Management Agency Karlsruhe (PTKA). The authors are responsible for the content of this publication.
+
 
 ## Similar Projects
 
-- [owlready2](https://owlready2.readthedocs.io/en/v0.35/) -> Makes Ontologies and Knowledge Graphs workable in python. Is used for storing information
-- [networkX](https://networkx.org/) -> Represent graphs in python; is used as inspiration for the Calls and structure of the project
-- [Causal Graphical Models Python Package](https://github.com/ijmbarr/causalgraphicalmodels) -> Major inspiration for this package, but we want to do these things differently:
+- [owlready2](https://owlready2.readthedocs.io/en/v0.35/) - Makes Ontologies and Knowledge Graphs workable in python. Is used for storing information
+- [networkX](https://networkx.org/) - Represent graphs in python; is used as inspiration for the Calls and structure of the project
+- [Causal Graphical Models Python Package](https://github.com/ijmbarr/causalgraphicalmodels) - Major inspiration for this package, but we want to do these things differently:
   - Represent Nodes and Edges as individual objects, establishing the connection to datasources / models
   - usage of [networkX MultiDiGraph](https://networkx.org/documentation/stable/reference/classes/multidigraph.html) as base for the SCMs to support multiple connections (at different times) between nodes   
-- [Causal Inference in Statistics](https://github.com/DataForScience/Causality/blob/master/CausalModel.py) -> Python Code accompanying a book, which also implements SCMs (without Time-Series)
+- [Causal Inference in Statistics](https://github.com/DataForScience/Causality/blob/master/CausalModel.py) - Python Code accompanying a book, which also implements SCMs (without Time-Series)
+
+
 
 
 
