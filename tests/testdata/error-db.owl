@@ -1,0 +1,453 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://iwu.fraunhofer.de/causalgraph/faults-extension/error-db"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://iwu.fraunhofer.de/causalgraph/faults-extension/error-db">
+    <Prefix name="" IRI="http://iwu.fraunhofer.de/causalgraph/faults-extension/error-db"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Import>http://iwu.fraunhofer.de/causalgraph/faults-extension</Import>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <Literal>An Ontology to map entries from the SQL error-db into the causalgraph notation.</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <Literal>causalgraph-error-db-mapping</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
+        <Literal>0.0.1</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="#Environment"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Error"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SqlTableEntry"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasEnvironment"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#sqlObjectProperties"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#additionalInformation"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#alternateName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#apiUrl"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#communicatesWith"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#errorCode"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#finalName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#id"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#ignoredUntil"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#manufacturer"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#message"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#personResponsible"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#role"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#thirdPartyName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Environment"/>
+        <Class IRI="#SqlTableEntry"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Error"/>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph/faults-extension#Fault_Event"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Error"/>
+        <Class IRI="#SqlTableEntry"/>
+    </SubClassOf>
+    <DisjointClasses>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph#CausalEdge"/>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph#CausalNode"/>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph#Creator"/>
+        <Class IRI="#Environment"/>
+    </DisjointClasses>
+    <DisjointClasses>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph#CausalEdge"/>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph#Creator"/>
+        <Class IRI="#SqlTableEntry"/>
+    </DisjointClasses>
+    <DisjointClasses>
+        <Class IRI="#Environment"/>
+        <Class IRI="#Error"/>
+    </DisjointClasses>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasEnvironment"/>
+        <ObjectProperty IRI="#sqlObjectProperties"/>
+    </SubObjectPropertyOf>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasEnvironment"/>
+    </FunctionalObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasEnvironment"/>
+        <Class IRI="#Error"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#sqlObjectProperties"/>
+        <Class IRI="#SqlTableEntry"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasEnvironment"/>
+        <Class IRI="#Environment"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#sqlObjectProperties"/>
+        <Class IRI="#SqlTableEntry"/>
+    </ObjectPropertyRange>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#additionalInformation"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#alternateName"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#apiUrl"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#communicatesWith"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#errorCode"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#finalName"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#id"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#ignoredUntil"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#manufacturer"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#message"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#personResponsible"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#role"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#thirdPartyName"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#additionalInformation"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#alternateName"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#apiUrl"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#communicatesWith"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#errorCode"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#finalName"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#id"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#ignoredUntil"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#manufacturer"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#message"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#personResponsible"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#role"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#thirdPartyName"/>
+    </FunctionalDataProperty>
+    <DataPropertyDomain>
+        <DataProperty IRI="#additionalInformation"/>
+        <Class IRI="#SqlTableEntry"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#alternateName"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#apiUrl"/>
+        <Class IRI="#SqlTableEntry"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#communicatesWith"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#errorCode"/>
+        <Class IRI="#Error"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#finalName"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#id"/>
+        <Class IRI="#SqlTableEntry"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#ignoredUntil"/>
+        <Class IRI="#Error"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#manufacturer"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#message"/>
+        <Class IRI="#Error"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#personResponsible"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#role"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#thirdPartyName"/>
+        <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#sqlDataProperties"/>
+        <Class IRI="#SqlTableEntry"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#additionalInformation"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#alternateName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#apiUrl"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#communicatesWith"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#errorCode"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#finalName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#id"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#ignoredUntil"/>
+        <Datatype abbreviatedIRI="xsd:dateTime"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#manufacturer"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#message"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#personResponsible"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#role"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#thirdPartyName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Environment</IRI>
+        <Literal xml:lang="en">Describes a hardware or software environment that generates data and events, especially fault events.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Environment</IRI>
+        <Literal xml:lang="en">Environment</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Error</IRI>
+        <Literal xml:lang="en">Describe general data of an Error as found in the error-db.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Error</IRI>
+        <Literal xml:lang="en">Error</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#SqlTableEntry</IRI>
+        <Literal xml:lang="en">Parentclass to aggregate all objects that are mapped from SQL tables of the error-database.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#SqlTableEntry</IRI>
+        <Literal xml:lang="en">SqlTableEntry</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#additionalInformation</IRI>
+        <Literal xml:lang="en">Optional additional information about the environment as json.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#alternateName</IRI>
+        <Literal xml:lang="en">Alternative names for environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#apiUrl</IRI>
+        <Literal xml:lang="en">Gives the Rest-API URL of the original  ressource. Via GET this ressource can be retrieved.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#communicatesWith</IRI>
+        <Literal xml:lang="en">List of other envrionments that the environments communicates with.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#communicatesWith</IRI>
+        <Literal xml:lang="en">communicatesWith</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#errorCode</IRI>
+        <Literal xml:lang="en">Errorcode of the fault as displayed on machine or constructed from hashing the message, if no errorcode is present.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#finalName</IRI>
+        <Literal xml:lang="en">Chosen name for the environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasEnvironment</IRI>
+        <Literal xml:lang="en">Connects Errors to an Environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#id</IRI>
+        <Literal xml:lang="en">Primary-key for the sqlTableElement.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#ignoredUntil</IRI>
+        <Literal xml:lang="en">Datetime until a fault is ignored for notifications.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#manufacturer</IRI>
+        <Literal xml:lang="en">Manufacturer/Developer of the environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#message</IRI>
+        <Literal xml:lang="en">Errormessage of the fault.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#personResponsible</IRI>
+        <Literal xml:lang="en">Information about the Person responsible for the environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#role</IRI>
+        <Literal xml:lang="en">Function/Role of the Environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#thirdPartyName</IRI>
+        <Literal xml:lang="en">Name given by someone else for the Environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#sqlDataProperties</IRI>
+        <Literal xml:lang="en">Top Data Property for all data Properties needed for error-db sql table mappings.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#sqlDataProperties</IRI>
+        <Literal xml:lang="en">sqlDataProperties</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->

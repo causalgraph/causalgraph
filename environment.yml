@@ -1,0 +1,11 @@
+name: causalgraph
+dependencies:
+    - python >= 3.9
+    - flake8
+    - recommonmark
+    - pytest
+    - pytest-cov
+    - pip 
+    - pip:
+        - -r requirements.txt
+        - sphinx-rtd-theme
