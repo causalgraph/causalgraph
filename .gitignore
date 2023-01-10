@@ -1,0 +1,42 @@
+# Development 
+.coverage
+.vscode
+shell_scripts
+examples/playground/*
+playground*
+.coverage
+report.xml
+
+# Exports
+examples/*.png
+examples/*.gml
+examples/*.graphml
+
+# DB Stuff
+*.sqlite3
+*.sqlite3-journal
+!*whole.sqlite3
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Log files
+*.log*
+*.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Sphinx documentation
+docs/_build
+
+# package building 
+dist
+build
+*.egg-info
+
+dataset.*
+*.hypothesis
+*.pytest_cache

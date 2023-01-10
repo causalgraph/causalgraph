@@ -1,0 +1,12 @@
+# causalgraph codebase
+owlready2==0.35
+networkx==2.6.3
+matplotlib==3.5.1
+requests==2.27.1
+sentry-sdk==1.5.4
+ecs_logging==1.1.0
+# DoWhy
+numpy==1.22.1
+pandas==1.2.3
+dowhy==0.7.1
+deepdiff==6.2.1

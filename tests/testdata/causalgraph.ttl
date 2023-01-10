@@ -1,0 +1,246 @@
+@prefix : <urn:absolute:causalgraph#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <urn:absolute:causalgraph> .
+
+<urn:absolute:causalgraph> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  urn:absolute:causalgraph#created
+:created rdf:type owl:ObjectProperty ;
+         owl:inverseOf :created ;
+         rdfs:domain :Creator ;
+         rdfs:range :CausalEdge ,
+                    :CausalNode .
+
+
+###  urn:absolute:causalgraph#hasCausalConnection
+:hasCausalConnection rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf owl:topObjectProperty ;
+                     rdf:type owl:SymmetricProperty .
+
+
+###  urn:absolute:causalgraph#hasCause
+:hasCause rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf :hasCausalConnection ;
+          owl:inverseOf :isCausing ;
+          rdfs:domain :CausalEdge ;
+          rdfs:range :CausalNode .
+
+
+###  urn:absolute:causalgraph#hasComponent
+:hasComponent rdf:type owl:ObjectProperty .
+
+
+###  urn:absolute:causalgraph#hasCreator
+:hasCreator rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf owl:topObjectProperty ;
+            rdf:type owl:FunctionalProperty ;
+            rdfs:domain :CausalEdge ,
+                        :CausalNode ;
+            rdfs:range :Creator .
+
+
+###  urn:absolute:causalgraph#hasEffect
+:hasEffect rdf:type owl:ObjectProperty ;
+           rdfs:subPropertyOf :hasCausalConnection ;
+           owl:inverseOf :isAffectedBy ;
+           rdfs:domain :CausalEdge ;
+           rdfs:range :CausalNode .
+
+
+###  urn:absolute:causalgraph#isAffectedBy
+:isAffectedBy rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf :hasCausalConnection ;
+              rdfs:domain :CausalNode ;
+              rdfs:range :CausalEdge .
+
+
+###  urn:absolute:causalgraph#isCausing
+:isCausing rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf :hasCausalConnection ;
+            rdfs:domain :CausalNode ;
+            rdfs:range :CausalEdge .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  urn:absolute:causalgraph#CausalEdge
+:CausalEdge rdf:type owl:Class ;
+            owl:disjointWith :CausalNode ;
+            rdfs:comment "Causal Edges connect two Causal Nodes and contain the information about the causal direction, as well as properties describing the nature of the causal connection."@en ;
+            rdfs:label "CausalEdge"@en .
+
+
+###  urn:absolute:causalgraph#CausalGraph
+:CausalGraph rdf:type owl:Class ;
+             owl:equivalentClass [ owl:intersectionOf ( [ rdf:type owl:Restriction ;
+                                                          owl:onProperty :hasComponent ;
+                                                          owl:someValuesFrom :CausalEdge
+                                                        ]
+                                                        [ rdf:type owl:Restriction ;
+                                                          owl:onProperty :hasComponent ;
+                                                          owl:someValuesFrom :CausalNode
+                                                        ]
+                                                      ) ;
+                                   rdf:type owl:Class
+                                 ] ;
+             rdfs:comment "Causal Graphs consist of Causal Edges and Causal Nodes. Depending on the infomation attached to the Causal Edges, it is classified into Causal Graphical Models (CGM) oder Structural Causal Model (SCM). If it falls in between, as not all Causal Edges contain Structural Equations, it is called Hybrid Causal Model (HCM)."@en ;
+             rdfs:label "CausalGraph"@en .
+
+
+###  urn:absolute:causalgraph#CausalGraphicalModel
+:CausalGraphicalModel rdf:type owl:Class ;
+                      rdfs:subClassOf :CausalGraph ;
+                      rdfs:comment "A Causal Graph WITHOUT functions / structural equations attached to ANY of its causal edges."@en ;
+                      rdfs:label "CausalGraphicalModel"@en .
+
+
+###  urn:absolute:causalgraph#CausalNode
+:CausalNode rdf:type owl:Class ;
+            rdfs:comment "A Causal Node refers to an information carying Node in the Causal Graph. The information can be of different types (e.g. Event, State, (Continous) Variable) and origins (created by Human or Machine)."@en ;
+            rdfs:label "CausalNode"@en .
+
+
+###  urn:absolute:causalgraph#Creator
+:Creator rdf:type owl:Class ;
+         rdfs:label "Creator"@en .
+
+
+###  urn:absolute:causalgraph#Error_Event
+:Error_Event rdf:type owl:Class ;
+             rdfs:subClassOf :Event ;
+             rdfs:comment "An Event describing an Error."@en ;
+             rdfs:label "Error Event"@en .
+
+
+###  urn:absolute:causalgraph#Event
+:Event rdf:type owl:Class ;
+       rdfs:subClassOf :CausalNode ;
+       rdfs:comment "Defines a Causal Node of with an Event-like Signal Type."@en ;
+       rdfs:label "Event"@en .
+
+
+###  urn:absolute:causalgraph#Expert
+:Expert rdf:type owl:Class ;
+        rdfs:subClassOf :Human .
+
+
+###  urn:absolute:causalgraph#Human
+:Human rdf:type owl:Class ;
+       rdfs:subClassOf :Creator ;
+       owl:disjointWith :Machine .
+
+
+###  urn:absolute:causalgraph#HumanInput_Event
+:HumanInput_Event rdf:type owl:Class ;
+                  rdfs:subClassOf :Event .
+
+
+###  urn:absolute:causalgraph#HumanInput_State
+:HumanInput_State rdf:type owl:Class ;
+                  rdfs:subClassOf :State .
+
+
+###  urn:absolute:causalgraph#HumanInput_Variable
+:HumanInput_Variable rdf:type owl:Class ;
+                     rdfs:subClassOf :Variable .
+
+
+###  urn:absolute:causalgraph#HybridCausalModel
+:HybridCausalModel rdf:type owl:Class ;
+                   rdfs:subClassOf :CausalGraph ;
+                   rdfs:comment "A Causal Graph WITH functions / structural equations attached to SOME (NOT ALL) of its causal edges."@en ;
+                   rdfs:label "HybridCausalModel"@en .
+
+
+###  urn:absolute:causalgraph#Importer
+:Importer rdf:type owl:Class ;
+          rdfs:subClassOf :Machine .
+
+
+###  urn:absolute:causalgraph#LearningAlgorithm
+:LearningAlgorithm rdf:type owl:Class ;
+                   rdfs:subClassOf :Machine .
+
+
+###  urn:absolute:causalgraph#Machine
+:Machine rdf:type owl:Class ;
+         rdfs:subClassOf :Creator .
+
+
+###  urn:absolute:causalgraph#MachineError_Event
+:MachineError_Event rdf:type owl:Class ;
+                    rdfs:subClassOf :Error_Event ,
+                                    :Machine_Event .
+
+
+###  urn:absolute:causalgraph#Machine_Event
+:Machine_Event rdf:type owl:Class ;
+               rdfs:subClassOf :Event .
+
+
+###  urn:absolute:causalgraph#Machine_State
+:Machine_State rdf:type owl:Class ;
+               rdfs:subClassOf :State .
+
+
+###  urn:absolute:causalgraph#Machine_Variable
+:Machine_Variable rdf:type owl:Class ;
+                  rdfs:subClassOf :Variable .
+
+
+###  urn:absolute:causalgraph#ManualError_Event
+:ManualError_Event rdf:type owl:Class ;
+                   rdfs:subClassOf :Error_Event ,
+                                   :HumanInput_Event .
+
+
+###  urn:absolute:causalgraph#State
+:State rdf:type owl:Class ;
+       rdfs:subClassOf :CausalNode ;
+       rdfs:comment "Defines a Causal Node of with an State-like Signal Type."@en ;
+       rdfs:label "State"@en .
+
+
+###  urn:absolute:causalgraph#StructuralCausalModel
+:StructuralCausalModel rdf:type owl:Class ;
+                       rdfs:subClassOf :CausalGraph ;
+                       rdfs:comment "A Causal Graph WITH functions / structural equations attached to ALL its causal edges."@en ;
+                       rdfs:label "StructuralCausalModel"@en .
+
+
+###  urn:absolute:causalgraph#Variable
+:Variable rdf:type owl:Class ;
+          rdfs:subClassOf :CausalNode .
+
+
+#################################################################
+#    General axioms
+#################################################################
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( :CausalGraphicalModel
+                :HybridCausalModel
+                :StructuralCausalModel
+              )
+] .
+
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( :Event
+                :State
+                :Variable
+              )
+] .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
