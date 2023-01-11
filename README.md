@@ -143,9 +143,12 @@ Sven Pieper, Carl Willy Mehling, Dominik Hirsch, Tobias Lüke, Steffen Ihlenfeld
 DOI: tba.
 
 Bibtex:
-```sh
+```bibtex
 @article{
-  tba.
+  title={tba.},
+  author = {tba.},
+  journal = {tba.},
+  year= {tba.}
 }
 ```
 
