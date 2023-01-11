@@ -83,7 +83,7 @@ pip install causalgraph
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Please have a look at the examples folder at [/examples](./examples). Here you can find some Jupter notebooks in which the most important functions are presented. You can also take a look at the causalgraph paper. It is referenced in the end of this README.
+Please have a look at the examples folder at [/examples](./examples). Here you can find some Jupyter notebooks in which the most important functions are presented. You can also take a look at the causalgraph paper. It is referenced in the end of this README.
 
 
 <!-- CONTRIBUTING -->
@@ -103,7 +103,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 
 <!-- CONTACT -->
@@ -133,7 +133,7 @@ The development of causalgraph is part of the research project KausaLAssist. It 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [iwu-shield]: https://img.shields.io/badge/Fraunhofer-IWU-179C7D?style=flat-square
-[pytest-shield]: https://img.shields.io/github/actions/workflow/status/causalgraph/causalgraph/python-app.yml?style=flat-square
+[pytest-shield]: https://img.shields.io/github/actions/workflow/status/causalgraph/causalgraph/python-app.yml?label=pytest
 [mit-licence]: https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square
 [pypi-version]: https://img.shields.io/pypi/v/causalgraph?style=flat-square
 [python-version]: https://img.shields.io/pypi/pyversions/causalgraph?style=flat-square
