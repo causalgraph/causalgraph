@@ -154,7 +154,7 @@ Bibtex:
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [iwu-shield]: https://img.shields.io/badge/Fraunhofer-IWU-179C7D?style=flat-square
-[pytest-shield]: https://img.shields.io/github/actions/workflow/status/causalgraph/causalgraph/python-app.yml?label=pytest
+[pytest-shield]: https://img.shields.io/github/actions/workflow/status/causalgraph/causalgraph/python-app.yml?label=pytest&style=flat-square
 [mit-licence]: https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square
 [pypi-version]: https://img.shields.io/pypi/v/causalgraph?style=flat-square
 [python-version]: https://img.shields.io/pypi/pyversions/causalgraph?style=flat-square
