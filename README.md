@@ -30,27 +30,29 @@
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary>Table of Contents</summary>
+  <summary>Table of contents</summary>
   <ol>
     <li><a href="#about-the-project">About the Project</a></li>
+    <li><a href="#getting-started">Getting started</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
     <li><a href="#similar-projects">Similar Projects</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#citing-this-project">Citing this project</a></li>
   </ol>
 </details>
 
 
 <!-- ABOUT THE PROJECT -->
-## About the Project
+## About the project
 
 causalgraph - modeling and saving causal graphs embedded in knowledge graphs. The package has been designed to provide an interface between causal disciplines such as causal discovery and causal inference. With this package, users can create and save causal graphs and export the generated graphs for use in other graph-based packages. The main advantage of the proposed package is its ability to facilitate the linking of additional information and metadata to causal structures. In addition, the package offers a variety of functions for graph modeling and plotting, such as editing, adding, and deleting nodes and edges. It is also compatible with widely used graph data science libraries such as [NetworkX](https://github.com/networkx/networkx) and [Tigramite](https://github.com/jakobrunge/tigramite) and incorporates a specially developed causalgraph ontology in the background. 
 
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Getting started
 
 You can either use the causalgraph source code directly, or install the python package using pip.
 
@@ -114,14 +116,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - Project Link: [https://github.com/causalgraph](https://github.com/causalgraph)
 
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-The development of causalgraph is part of the research project KausaLAssist. It is funded by the German Federal Ministry of Education and Research (BMBF) within the "Future of Value Creation - Research on Production, Services and Work" program (funding number 02P20A150) and managed by the Project Management Agency Karlsruhe (PTKA). The authors are responsible for the content of this publication.
-
-
 <!-- SIMILAR PROJECTS -->
-## Similar Projects
+## Similar projects
 
 - [owlready2](https://owlready2.readthedocs.io/en/v0.35/) - Makes Ontologies and Knowledge Graphs workable in python. Is used for storing information
 - [networkX](https://networkx.org/) - Represent graphs in python; is used as inspiration for the Calls and structure of the project
@@ -130,6 +126,28 @@ The development of causalgraph is part of the research project KausaLAssist. It 
   - usage of [networkX MultiDiGraph](https://networkx.org/documentation/stable/reference/classes/multidigraph.html) as base for the SCMs to support multiple connections (at different times) between nodes   
 - [Causal Inference in Statistics](https://github.com/DataForScience/Causality/blob/master/CausalModel.py) - Python Code accompanying a book, which also implements SCMs (without Time-Series)
 
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+The development of causalgraph is part of the research project KausaLAssist. It is funded by the German Federal Ministry of Education and Research (BMBF) within the "Future of Value Creation - Research on Production, Services and Work" program (funding number 02P20A150) and managed by the Project Management Agency Karlsruhe (PTKA). The authors are responsible for the content of this publication.
+
+
+<!-- CITING -->
+## Citing this project
+
+If you find causalgraph useful for your research, please cite us as follows:
+
+Sven Pieper, Carl Willy Mehling, Dominik Hirsch, Tobias Lüke, Steffen Ihlenfeldt. causalgraph - A Python Package for Modelling, Persisting and Visualizing Causal Graphs, Embedded in Knowledge Graphs. 2023. [https://arxiv.org/...](https://arxiv.org/)
+
+DOI: tba.
+
+Bibtex:
+```sh
+@article{
+  tba.
+}
+```
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [iwu-shield]: https://img.shields.io/badge/Fraunhofer-IWU-179C7D?style=flat-square
