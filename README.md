@@ -19,9 +19,9 @@
     <!--<a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
     <br />-->
     <br />
-    <a href="https://github.com/causalgraph/causalgraph/issues">Request Feature</a>
+    <a href="https://github.com/causalgraph/causalgraph/issues/new?labels=enhancement">Request Feature</a>
     ·
-    <a href="https://github.com/causalgraph/causalgraph/issues">Report Bug</a>
+    <a href="https://github.com/causalgraph/causalgraph/issues/new?labels=bug">Report Bug</a>
     ·
     <a href="mailto:causalgraph@iwu.fraunhofer.de">Contact us</a>
   </p>
@@ -91,9 +91,8 @@ Please have a look at the examples folder at [/examples](./examples). Here you c
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. 
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the [enhancement](https://github.com/causalgraph/causalgraph/issues/new?labels=enhancement) tag.
 Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
@@ -159,3 +158,4 @@ Bibtex:
 [pypi-version]: https://img.shields.io/pypi/v/causalgraph?style=flat-square
 [python-version]: https://img.shields.io/pypi/pyversions/causalgraph?style=flat-square
 [download-counter]: https://img.shields.io/pypi/dm/causalgraph?style=flat-square
+[enhancement-label-shield]: https://img.shields.io/github/labels/causalgraph/causalgraph/enhancement?style=flat-square
