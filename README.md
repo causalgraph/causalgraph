@@ -19,9 +19,9 @@
     <!--<a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
     <br />-->
     <br />
-    <a href="https://github.com/causalgraph/causalgraph/issues">Request Feature</a>
+    <a href="https://github.com/causalgraph/causalgraph/issues/new?labels=enhancement">Request Feature</a>
     ·
-    <a href="https://github.com/causalgraph/causalgraph/issues">Report Bug</a>
+    <a href="https://github.com/causalgraph/causalgraph/issues/new?labels=bug">Report Bug</a>
     ·
     <a href="mailto:causalgraph@iwu.fraunhofer.de">Contact us</a>
   </p>
@@ -48,7 +48,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About the project
 
-causalgraph - modeling and saving causal graphs embedded in knowledge graphs. The package has been designed to provide an interface between causal disciplines such as causal discovery and causal inference. With this package, users can create and save causal graphs and export the generated graphs for use in other graph-based packages. The main advantage of the proposed package is its ability to facilitate the linking of additional information and metadata to causal structures. In addition, the package offers a variety of functions for graph modeling and plotting, such as editing, adding, and deleting nodes and edges. It is also compatible with widely used graph data science libraries such as [NetworkX](https://github.com/networkx/networkx) and [Tigramite](https://github.com/jakobrunge/tigramite) and incorporates a specially developed causalgraph ontology in the background. 
+causalgraph - modeling and saving causal graphs embedded in knowledge graphs. The package has been designed to provide an interface between causal disciplines such as causal discovery and causal inference. With this package, users can create and save causal graphs and export the generated graphs for use in other graph-based packages. The main advantage of the proposed package is its ability to facilitate the linking of additional information and metadata to causal structures. In addition, the package offers a variety of functions for graph modeling and plotting, such as editing, adding, and deleting nodes and edges. It is also compatible with widely used graph data science libraries such as [NetworkX](https://github.com/networkx/networkx) and [Tigramite](https://github.com/jakobrunge/tigramite) and incorporates a specially developed [causalgraph ontology](https://github.com/causalgraph/causalgraph-ontology) in the background. 
 
 
 <!-- GETTING STARTED -->
@@ -91,9 +91,8 @@ Please have a look at the examples folder at [/examples](./examples). Here you c
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. 
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the [enhancement](https://github.com/causalgraph/causalgraph/issues/new?labels=enhancement) tag.
 Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
@@ -138,17 +137,20 @@ The development of causalgraph is part of the research project KausaLAssist. It 
 
 If you find causalgraph useful for your research, please cite us as follows:
 
-Sven Pieper, Carl Willy Mehling, Dominik Hirsch, Tobias Lüke, Steffen Ihlenfeldt. causalgraph - A Python Package for Modelling, Persisting and Visualizing Causal Graphs, Embedded in Knowledge Graphs. 2023. [https://arxiv.org/...](https://arxiv.org/)
+Sven Pieper, Carl Willy Mehling, Dominik Hirsch, Tobias Lüke, Steffen Ihlenfeldt. causalgraph: A Python Package for Modeling, Persisting and Visualizing Causal Graphs Embedded in Knowledge Graphs. 2023. [https://arxiv.org/abs/2301.08490](https://arxiv.org/abs/2301.08490)
 
-DOI: tba.
+DOI: [10.48550/arXiv.2301.08490](https://doi.org/10.48550/arXiv.2301.08490)
 
 Bibtex:
 ```bibtex
-@article{
-  title={tba.},
-  author = {tba.},
-  journal = {tba.},
-  year= {tba.}
+@misc{
+  doi = {10.48550/ARXIV.2301.08490},
+  url = {https://arxiv.org/abs/2301.08490},
+  author = {Pieper, Sven and Mehling, Carl Willy and Hirsch, Dominik and Lüke, Tobias and Ihlenfeldt, Steffen},
+  keywords = {Artificial Intelligence (cs.AI), FOS: Computer and information sciences, FOS: Computer and information sciences, E.1; E.2},
+  title = {causalgraph: A Python Package for Modeling, Persisting and Visualizing Causal Graphs Embedded in Knowledge Graphs},
+  publisher = {arXiv},
+  year = {2023}
 }
 ```
 
@@ -159,3 +161,4 @@ Bibtex:
 [pypi-version]: https://img.shields.io/pypi/v/causalgraph?style=flat-square
 [python-version]: https://img.shields.io/pypi/pyversions/causalgraph?style=flat-square
 [download-counter]: https://img.shields.io/pypi/dm/causalgraph?style=flat-square
+[enhancement-label-shield]: https://img.shields.io/github/labels/causalgraph/causalgraph/enhancement?style=flat-square
