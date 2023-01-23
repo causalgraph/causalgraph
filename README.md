@@ -137,17 +137,20 @@ The development of causalgraph is part of the research project KausaLAssist. It 
 
 If you find causalgraph useful for your research, please cite us as follows:
 
-Sven Pieper, Carl Willy Mehling, Dominik Hirsch, Tobias Lüke, Steffen Ihlenfeldt. causalgraph - A Python Package for Modelling, Persisting and Visualizing Causal Graphs, Embedded in Knowledge Graphs. 2023. [https://arxiv.org/...](https://arxiv.org/)
+Sven Pieper, Carl Willy Mehling, Dominik Hirsch, Tobias Lüke, Steffen Ihlenfeldt. causalgraph: A Python Package for Modeling, Persisting and Visualizing Causal Graphs Embedded in Knowledge Graphs. 2023. [https://arxiv.org/abs/2301.08490](https://arxiv.org/abs/2301.08490)
 
-DOI: tba.
+DOI: [10.48550/arXiv.2301.08490](https://doi.org/10.48550/arXiv.2301.08490)
 
 Bibtex:
 ```bibtex
-@article{
-  title={tba.},
-  author = {tba.},
-  journal = {tba.},
-  year= {tba.}
+@misc{
+  doi = {10.48550/ARXIV.2301.08490},
+  url = {https://arxiv.org/abs/2301.08490},
+  author = {Pieper, Sven and Mehling, Carl Willy and Hirsch, Dominik and Lüke, Tobias and Ihlenfeldt, Steffen},
+  keywords = {Artificial Intelligence (cs.AI), FOS: Computer and information sciences, FOS: Computer and information sciences, E.1; E.2},
+  title = {causalgraph: A Python Package for Modeling, Persisting and Visualizing Causal Graphs Embedded in Knowledge Graphs},
+  publisher = {arXiv},
+  year = {2023}
 }
 ```
 
