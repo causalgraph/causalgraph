@@ -12,10 +12,12 @@ import os
 import numpy as np
 from dowhy import CausalModel
 import pandas as pd
+from deepdiff import DeepDiff
+
 # causalgraph imports
 from causalgraph import Graph
 import causalgraph.utils.owlready2_utils as owl2utils
-from deepdiff import DeepDiff
+from causalgraph.utils.owlready2_utils import is_subclass_of
 
 
 ########################################
@@ -27,30 +29,29 @@ def fixture_testdata_dir() -> Path:
     return testdata_dir
 
 @pytest.fixture(name="test_graph_simple")
-def fixture_test_graph_simple(tmpdir) -> Graph:
-    graph = Graph(sql_db_filename=f'{tmpdir}/simple.sqlite3')
+def fixture_test_graph_simple() -> Graph:
+    graph = Graph(sql_db_filename=None)
     # Init creators
-    creator_name = graph.add.individual_of_type(class_of_individual="Creator",
+    creator_node = graph.add.individual_of_type(class_of_individual="Creator",
                                                 name_for_individual="master_creator",
                                                 comment=["Creates everything"])
-    creator_node = owl2utils.get_entity_by_name(creator_name, graph.store)
     # Add nodes
     graph.add.causal_node("node_1")
     graph.add.causal_node("node_2", comment=["node_2 comment"])
     graph.add.causal_node("node_3_c", hasCreator=[creator_node])
     # Add edges
-    graph.add.causal_edge(cause_node_name="node_1",
-                          effect_node_name="node_2",
+    graph.add.causal_edge(cause_node="node_1",
+                          effect_node="node_2",
                           name_for_edge="edge_1")
-    graph.add.causal_edge(cause_node_name="node_2",
-                          effect_node_name="node_3_c",
+    graph.add.causal_edge(cause_node="node_2",
+                          effect_node="node_3_c",
                           name_for_edge="edge_2_c",
                           confidence=1.0,
                           time_lag_s=5.0,
                           hasCreator=[creator_node],
                           comment=["edge_2c_comment"])
-    graph.add.causal_edge(cause_node_name= "node_2",
-                          effect_node_name= "node_3_c",
+    graph.add.causal_edge(cause_node= "node_2",
+                          effect_node= "node_3_c",
                           name_for_edge= "edge_3_c",
                           confidence=0.5,
                           time_lag_s=10.0,
@@ -59,20 +60,20 @@ def fixture_test_graph_simple(tmpdir) -> Graph:
     return graph
 
 @pytest.fixture(name="test_graph_third")
-def fixture_test_graph_third(tmpdir, testdata_dir) -> Graph:
+def fixture_test_graph_third(testdata_dir) -> Graph:
     external_ontos = [f"{testdata_dir}/faults.owl", f"{testdata_dir}/error-db.owl", f"{testdata_dir}/pizza.owl"]
-    graph = Graph(sql_db_filename=f'{tmpdir}/third.sqlite3', external_ontos=external_ontos)
-    owl2utils.create_individual_of_type("Creator", store=graph.store, name_for_individual='Creator_1')
+    graph = Graph(sql_db_filename=None, external_ontos=external_ontos)
+    graph.add.individual_of_type("Creator", name_for_individual='Creator_1')
     creator_1 = owl2utils.get_entity_by_name('Creator_1', graph.store)
-    owl2utils.create_individual_of_type("Environment", store=graph.store, name_for_individual='environment_1')
+    graph.add.individual_of_type("Environment", name_for_individual='environment_1')
     environment_1 = owl2utils.get_entity_by_name('environment_1', graph.store)
-    owl2utils.create_individual_of_type("Mushroom", store=graph.store, name_for_individual='Mushroom_1', hasCreator=[creator_1])
-    owl2utils.create_individual_of_type("Mushroom", store=graph.store, name_for_individual='Mushroom_2')
-    owl2utils.create_individual_of_type("Error", store=graph.store, name_for_individual='9801', hasEnvironment=environment_1, hasCreator=[creator_1], errorCode=9801, apiUrl='http://localhost:8080/db/Errors/9801', message='Fehlertext asdf asdf')
-    owl2utils.create_individual_of_type("Error", store=graph.store, name_for_individual='5800', errorCode=5800, apiUrl='http://localhost:8080/db/Errors/5800', message='asdf', comment=['test comment'])
-    graph.add.causal_edge(9801, 5800, "Error_Edge", hasCreator=[creator_1], confidence=0.9)
+    graph.add.individual_of_type("Mushroom", name_for_individual='Mushroom_1', hasCreator=[creator_1])
+    graph.add.individual_of_type("Mushroom", name_for_individual='Mushroom_2')
+    graph.add.individual_of_type("Error", name_for_individual='9801', hasEnvironment=environment_1, hasCreator=[creator_1], errorCode='9801', apiUrl='http://localhost:8080/db/Errors/9801', message='Fehlertext asdf asdf')
+    graph.add.individual_of_type("Error", name_for_individual='5800', errorCode='5800', apiUrl='http://localhost:8080/db/Errors/5800', message='asdf', comment=['test comment'])
+    graph.add.causal_edge('9801', '5800', "Error_Edge", hasCreator=[creator_1], confidence=0.9)
     graph.add.causal_edge('Mushroom_1', 'Mushroom_2', "Mushroom_Edge", time_lag_s=2.2, comment=['test'])
-    graph.add.causal_edge(9801, 'Mushroom_2', "Mushroom_2_9801_Edge", time_lag_s=2)
+    graph.add.causal_edge('9801', 'Mushroom_2', "Mushroom_2_9801_Edge", time_lag_s=2)
     return graph
 
 
@@ -110,6 +111,8 @@ def test_export_cg_simple_to_tigra(test_graph_simple: Graph):
             graph_simple_dict[individual].pop('comment')
         except KeyError:
             pass
+    diff = DeepDiff(graph_simple_dict, tigra_simple_dict, ignore_order=True)
+    print(diff)
     assert graph_simple_dict == tigra_simple_dict
 
 def test_export_cg_third_simple_to_tigra(test_graph_third: Graph):
@@ -117,9 +120,14 @@ def test_export_cg_third_simple_to_tigra(test_graph_third: Graph):
     node_names, edge_names, link_matrix, q_matrix, timestep_len_s = test_graph_third.export.tigra()
     graph_simple_dict = test_graph_third.map.all_individuals_to_dict()
     tigra_simple_dict = test_graph_third.map.graph_dict_from_tigra(node_names, edge_names, link_matrix, q_matrix, timestep_len_s)
-    # pop creator, iri, comment and third party properties
-    # because tigramite export can't handle those
+    # Adapt the original dict to only include the functionalites the tigra export can handle:
     for individual in list(graph_simple_dict):
+        # Change all CausalNode / CausalEdge Subclasses to "CausalNode" / "CausalEdge"
+        if any(is_subclass_of(type_, "CausalNode", test_graph_third.store) for type_ in graph_simple_dict[individual]["type"]):
+            graph_simple_dict[individual]["type"] = ["CausalNode"]
+        if any(is_subclass_of(type_, "CausalEdge", test_graph_third.store) for type_ in graph_simple_dict[individual]["type"]):
+            graph_simple_dict[individual]["type"] = ["CausalEdge"]
+        # pop creator, iri, comment and third party properties, because tigramite can export these
         for prop in list(graph_simple_dict[individual].keys()):
             if prop in (test_graph_third.map.third_party_data_properties + test_graph_third.map.third_party_object_properties + ['iri', 'hasCreator', 'comment']):
                 graph_simple_dict[individual].pop(prop)
@@ -127,6 +135,7 @@ def test_export_cg_third_simple_to_tigra(test_graph_third: Graph):
                 # Fix time conversion losses
                 graph_simple_dict[individual][prop] = float(round((graph_simple_dict[individual][prop])/timestep_len_s))
     diff = DeepDiff(graph_simple_dict, tigra_simple_dict, ignore_order=True)
+    print(diff)
     assert diff == {}
 
 def test_export_cg_simple_to_graphml(test_graph_simple: Graph, tmpdir: str):

@@ -42,8 +42,8 @@ class Draw():
         for individual in graph_dict:
             individual_type = graph_dict[individual]["type"]
             if individual_type == "CausalEdge":
-                cause = graph_dict[individual].get("hasCause", [None])[0]
-                effect = graph_dict[individual].get("hasEffect", [None])[0]
+                cause = graph_dict[individual].get("hasCause", None)
+                effect = graph_dict[individual].get("hasEffect", None)
                 timelag = graph_dict[individual].get("hasTimeLag", None)
                 confidence = graph_dict[individual].get("hasConfidence", None)
                 # Append to edge_labels dict
@@ -109,8 +109,8 @@ class Draw():
                 nodes_html.append(node)
             if individual_type == "CausalEdge":
                 edge = None
-                cause = graph_dict[individual].get("hasCause", [None])[0]
-                effect = graph_dict[individual].get("hasEffect", [None])[0]
+                cause = graph_dict[individual].get("hasCause", None)
+                effect = graph_dict[individual].get("hasEffect", None)
                 timelag = graph_dict[individual].get("hasTimeLag", None)
                 confidence = graph_dict[individual].get("hasConfidence", None)
                 if ((cause and effect) is not None) and ((confidence and timelag) is None):

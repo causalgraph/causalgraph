@@ -25,70 +25,201 @@
     </Annotation>
     <Annotation>
         <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
-        <Literal xml:lang="en">0.10</Literal>
+        <Literal xml:lang="en">0.0.3</Literal>
     </Annotation>
     <Declaration>
-        <Class IRI="#Fault_Event"/>
+        <Class IRI="#FaultStateBegin_Event"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#MachineFault_Event"/>
+        <Class IRI="#FaultStateEnd_Event"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#ManualFault_Event"/>
+        <Class IRI="#FaultStateEvents"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Fault_State"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#MachineFault_State"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ManualFault_State"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#groupedBy"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasBeginEvent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasEndEvent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFaultStateEvent"/>
     </Declaration>
     <SubClassOf>
-        <Class IRI="#Fault_Event"/>
+        <Class IRI="#FaultStateBegin_Event"/>
+        <Class IRI="#FaultStateEvents"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#FaultStateEnd_Event"/>
+        <Class IRI="#FaultStateEvents"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#FaultStateEvents"/>
         <Class abbreviatedIRI="cg:Event"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#MachineFault_Event"/>
-        <Class abbreviatedIRI="cg:Machine_Event"/>
+        <Class IRI="#Fault_State"/>
+        <Class abbreviatedIRI="cg:State"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#MachineFault_Event"/>
-        <Class IRI="#Fault_Event"/>
+        <Class IRI="#MachineFault_State"/>
+        <Class abbreviatedIRI="cg:Machine_State"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#ManualFault_Event"/>
-        <Class abbreviatedIRI="cg:HumanInput_Event"/>
+        <Class IRI="#MachineFault_State"/>
+        <Class IRI="#Fault_State"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#ManualFault_Event"/>
-        <Class IRI="#Fault_Event"/>
+        <Class IRI="#ManualFault_State"/>
+        <Class abbreviatedIRI="cg:HumanInput_State"/>
     </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ManualFault_State"/>
+        <Class IRI="#Fault_State"/>
+    </SubClassOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasBeginEvent"/>
+        <ObjectProperty IRI="#hasFaultStateEvent"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasEndEvent"/>
+        <ObjectProperty IRI="#hasFaultStateEvent"/>
+    </SubObjectPropertyOf>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#groupedBy"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasBeginEvent"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasEndEvent"/>
+    </FunctionalObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#groupedBy"/>
+        <Class abbreviatedIRI="owl:Thing"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasBeginEvent"/>
+        <Class IRI="#Fault_State"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasEndEvent"/>
+        <Class IRI="#Fault_State"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasFaultStateEvent"/>
+        <Class IRI="#Fault_State"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#groupedBy"/>
+        <Class abbreviatedIRI="owl:Thing"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasBeginEvent"/>
+        <Class IRI="#FaultStateBegin_Event"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasEndEvent"/>
+        <Class IRI="#FaultStateEnd_Event"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasFaultStateEvent"/>
+        <Class IRI="#FaultStateEvents"/>
+    </ObjectPropertyRange>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
-        <IRI>#Fault_Event</IRI>
-        <Literal xml:lang="en">An Event describing a Fault-Instance.</Literal>
+        <IRI>#FaultStateBegin_Event</IRI>
+        <Literal xml:lang="en">Markes the Begining of a state as event.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#Fault_Event</IRI>
-        <Literal xml:lang="en">Fault Event</Literal>
+        <IRI>#FaultStateBegin_Event</IRI>
+        <Literal xml:lang="en">FaultStateBegin Event</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
-        <IRI>#MachineFault_Event</IRI>
-        <Literal xml:lang="en">A FaultEvent is generated automatically by a Machine or a software artifact.</Literal>
+        <IRI>#FaultStateEnd_Event</IRI>
+        <Literal xml:lang="en">Marks the end (=last timestamp) of a certain state as dedicated event.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#MachineFault_Event</IRI>
-        <Literal xml:lang="en">MachineFault Event</Literal>
+        <IRI>#FaultStateEnd_Event</IRI>
+        <Literal xml:lang="en">FaultStateEnd Event</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
-        <IRI>#ManualFault_Event</IRI>
-        <Literal xml:lang="en">A FaultEvent indicated manually, for example, through human intervention.</Literal>
+        <IRI>#FaultStateEvents</IRI>
+        <Literal xml:lang="en">Aggregates Events that describe special Events for FaultStates. For Example the begin and end of FaultStates.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#ManualFault_Event</IRI>
-        <Literal xml:lang="en">ManualFault Event</Literal>
+        <IRI>#FaultStateEvents</IRI>
+        <Literal xml:lang="en">FaultState Events</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Fault_State</IRI>
+        <Literal xml:lang="en">A binary state describing if a current Fault is ongoing (true) or inactive (false). The Begin and end of the state can optionally be described with dedicated FaultState Events.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Fault_State</IRI>
+        <Literal xml:lang="en">Fault State</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#MachineFault_State</IRI>
+        <Literal xml:lang="en">A FaultState that is generated automatically by a Machine or a software artifact.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#MachineFault_State</IRI>
+        <Literal xml:lang="en">MachineFault State</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#ManualFault_State</IRI>
+        <Literal xml:lang="en">A Fault State indicated manually, for example, through human intervention.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#ManualFault_State</IRI>
+        <Literal xml:lang="en">ManualFault State</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#groupedBy</IRI>
+        <Literal xml:lang="en">SHOULD BE MOVED TO CAUSALGRAPH ONTOLOGY: Points from a (child) node to a (parent) node that groupes multiple nodes into a broader concept. This property is used to collapse multiple nodes into a bigger node.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasBeginEvent</IRI>
+        <Literal xml:lang="en">Points from a FaultState to the FaultStateBegin_Event.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasEndEvent</IRI>
+        <Literal xml:lang="en">Point from a FaultState to an FaultStateEvent that marks the end of the State.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasFaultStateEvent</IRI>
+        <Literal xml:lang="en">Aggregates properties to mark events belonging to a FaultState.</Literal>
     </AnnotationAssertion>
 </Ontology>
 
 
 
 <!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
-

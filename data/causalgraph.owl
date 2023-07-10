@@ -23,7 +23,7 @@
     </Annotation>
     <Annotation>
         <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
-        <Literal xml:lang="en">0.1.2</Literal>
+        <Literal xml:lang="en">0.15</Literal>
     </Annotation>
     <Declaration>
         <Class IRI="#CausalEdge"/>
@@ -224,6 +224,12 @@
         <ObjectProperty IRI="#hasEffect"/>
         <ObjectProperty IRI="#isAffectedBy"/>
     </InverseObjectProperties>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasCause"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasEffect"/>
+    </FunctionalObjectProperty>
     <SymmetricObjectProperty>
         <ObjectProperty IRI="#hasCausalConnection"/>
     </SymmetricObjectProperty>
@@ -237,11 +243,7 @@
     </ObjectPropertyDomain>
     <ObjectPropertyDomain>
         <ObjectProperty IRI="#hasCreator"/>
-        <Class IRI="#CausalEdge"/>
-    </ObjectPropertyDomain>
-    <ObjectPropertyDomain>
-        <ObjectProperty IRI="#hasCreator"/>
-        <Class IRI="#CausalNode"/>
+        <Class abbreviatedIRI="owl:Thing"/>
     </ObjectPropertyDomain>
     <ObjectPropertyDomain>
         <ObjectProperty IRI="#hasEffect"/>
@@ -257,11 +259,7 @@
     </ObjectPropertyDomain>
     <ObjectPropertyRange>
         <ObjectProperty IRI="#created"/>
-        <Class IRI="#CausalEdge"/>
-    </ObjectPropertyRange>
-    <ObjectPropertyRange>
-        <ObjectProperty IRI="#created"/>
-        <Class IRI="#CausalNode"/>
+        <Class abbreviatedIRI="owl:Thing"/>
     </ObjectPropertyRange>
     <ObjectPropertyRange>
         <ObjectProperty IRI="#hasCause"/>
@@ -331,10 +329,23 @@
     </DataPropertyRange>
     <DataPropertyRange>
         <DataProperty IRI="#hasTimeLag"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasTimeLag"/>
         <DatatypeRestriction>
             <Datatype abbreviatedIRI="xsd:double"/>
             <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
                 <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#double">0.0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasTimeLag"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:int"/>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#int">0</Literal>
             </FacetRestriction>
         </DatatypeRestriction>
     </DataPropertyRange>
@@ -515,16 +526,37 @@ In future releases the graph will be further classified into Causal Graphical Mo
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasCause</IRI>
+        <Literal xml:lang="en">A CausalEdge can only have a single &apos;cause&apos; indicated via the functional &apos;hasCause&apos; property.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#hasConfidence</IRI>
         <Literal xml:lang="en">Functional property of a CausalEdge. Measures the Creator&apos;s confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge&apos;s existence, while 0.0 means that this particular edge is not present.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#hasEffect</IRI>
+        <Literal xml:lang="en">A CausalEdge can only have a single &apos;effect&apos; indicated via the functional &apos;hasEffect&apos; property.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#hasTimeLag</IRI>
         <Literal xml:lang="en">Functional property of a CausalEdge. Measures in SECONDS,  the time lag between cause and the effect to take place. Only positive values are allowed, which means that the effect always occurs after the effect.</Literal>
     </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#isAffectedBy</IRI>
+        <Literal xml:lang="en">A CausalNode can be influenced by many  &apos;causes&apos;  indicated via different CausalEdges pointing toward a CausalNode. All Edges influencing the CausalNode are gathered via the &apos;isAffectedBy&apos; property.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#isCausing</IRI>
+        <Literal xml:lang="en">A CausalNode can influence many  &apos;effects&apos;  indicated via different CausalEdges being caused by a CausalNode. All Edges influenced from the CausalNode are gathered via the &apos;isCausing&apos; property.</Literal>
+    </AnnotationAssertion>
 </Ontology>
 
 
 
 <!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

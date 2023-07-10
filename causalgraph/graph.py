@@ -23,7 +23,7 @@ from causalgraph.store.remove import Remove
 from causalgraph.utils.mapping import Mapping
 import causalgraph.utils.owlready2_utils as owlutils
 from causalgraph.utils.logging_utils import init_logger
-from causalgraph.utils.path_utils import get_project_root
+from causalgraph.utils.misc_utils import get_project_root
 CAUSALGRAPH_ONTO_PATH: Path = Path.joinpath(get_project_root(), "data", 'causalgraph.owl')
 
 from causalgraph.store.load import Load
@@ -35,31 +35,35 @@ class Graph():
     """ Graph with causal information embedded in knowledge graph.
     """
     def __init__(self, 
-                sql_db_filename: str = "causalgraph.sqlite3",
+                sql_db_filename: str = None,
                 sql_exclusive: bool = False,
-                logFileDir: str = None,
+                log_file_dir: str = None,
                 logger_level: int = logging.WARNING,
                 external_ontos: list[str] = None,
                 external_graph: Union[networkx.MultiDiGraph, tuple] = None,
+                validate_domain_range: bool = True
     ) -> None:
         """Instantiates a Graph as the central object of causalgraph.
 
-        :param sql_db_filename: path to sqlite3.db for storage, defaults to "causalgraph.sqlite3"
+        :param sql_db_filename: Optional path to a sqlite3-DB (path ending with .sqlite3) for storing the graph in a db. Set None for storing on memory, defaults to None
         :type sql_db_filename: str, optional
         :param sql_exclusive: if sql-db should be closed for parallel requests, defaults to False
         :type sql_exclusive: bool, optional
-        :param logFileDir: path to the log-file directory, defaults to '{project_root}/data/logs/cg.json'
-        :type logFileDir: str, optional
+        :param log_file_dir: path to the log-file directory, defaults to '{project_root}/data/logs/cg.json'
+        :type log_file_dir: str, optional
         :param logger_level: Verbosity level of logger
         :type logger_level: int
         :param external_ontos: List of local Paths to file or URL to ontology in web.
         :type external_ontos: list[str], optional
         :param external_graph: NetworkX.MultiDiGraph or Tigramite Graph representation.
         :type external_graph: Union[networkx.MultiDiGraph, Tuple(list, dict, ndarray, ndarray, int)], optional
+        :param validate_domain_range: If True, all properties will be evaluated with domain and range before creating new individuals, defaults to True
+        :type validate_domain_range: bool, optional
         """
         # Store attributes if necessary
         self.sql_db_filename = sql_db_filename
         self.core_onto_path = CAUSALGRAPH_ONTO_PATH.absolute()
+        self.validate_domain_range = validate_domain_range
         # Check if necessary onto_file is present:
         if self.core_onto_path.is_file() is False:
             raise FileNotFoundError("The necessary base ontology 'causalgraph' was not found at " +
@@ -70,56 +74,56 @@ class Graph():
                                   console_handler_level=logger_level,
                                   file_handler=True,
                                   elastic_style_json=True,
-                                  log_file_dir=logFileDir)
+                                  log_file_dir=log_file_dir)
         self.store = self._init_store_backend_sqldb(self.sql_db_filename, sql_exclusive)
         self.individuals_onto, self.classes_onto = self._init_namespaces(self.core_onto_path, self.store)
-        self.map = Mapping(graph=self, logger=self.logger)
         # Include functionalities wrapped in singleton objects
-        self.add = Add(store=self.store, logger=self.logger)
-        self.edit = Edit(store=self.store, logger=self.logger)
+        self.add = Add(store=self.store, logger=self.logger, validate_domain_range=self.validate_domain_range)
+        self.edit = Edit(store=self.store, logger=self.logger, validate_domain_range=self.validate_domain_range)
         self.remove = Remove(store=self.store, logger=self.logger)
+        self.map = Mapping(graph=self, logger=self.logger)
         self.export = Export(graph=self, logger=self.logger)
         self.load = Load(graph=self, logger=self.logger)
         self.draw = Draw(graph=self)
-
         # Check if there are third party ontos to be loaded directly at start
         if external_ontos is not None:
             for onto_path in external_ontos:
                 self.import_ontology(onto_path)
-        
-        ### Check if nx or tigra was passed
+        ### Check if external graph (nx or tigra) was passed
         if external_graph is not None:
-            if type(external_graph) is networkx.MultiDiGraph:
-                graph_dict = self.map.graph_dict_from_nx(external_graph)
-                #print(graph_dict)
+            self._init_external_graph(external_graph)
+        self.logger.info("Initialized the Causal Knowledge Graph.")
+
+        
+    def _init_external_graph(self, external_graph: Union[networkx.MultiDiGraph, tuple]):
+        if type(external_graph) is networkx.MultiDiGraph:
+            graph_dict = self.map.graph_dict_from_nx(external_graph)
+            _ = self.map.fill_empty_graph_from_dict(graph_dict)
+            graph_dict = self.map.all_individuals_to_dict()
+            if graph_dict != {}:
+                self.logger.info("Init by importing a MultiDiGraph has been successful.")
+            else:
+                self.logger.error("Importing the MultiDiGraph did not result in any instantiation of individuals in the new graph.")
+        elif type(external_graph) in [tuple, Tuple]:
+            if len(external_graph) == 5:
+                graph_dict = self.map.graph_dict_from_tigra(
+                    node_names=external_graph[0],
+                    edge_names=external_graph[1],
+                    link_matrix=external_graph[2],
+                    q_matrix=external_graph[3],
+                    timestep_len_s=external_graph[4])
                 _ = self.map.fill_empty_graph_from_dict(graph_dict)
                 graph_dict = self.map.all_individuals_to_dict()
                 if graph_dict != {}:
-                    self.logger.info("Init by importing a MultiDiGraph has been successful.")
+                    self.logger.info("Init by importing a Tigramite Tuple has been successful.")
                 else:
-                    self.logger.error("Importing the MultiDiGraph did not result in any instantiation of individuals in the new graph.")
-            elif type(external_graph) in [tuple, Tuple]:
-                if len(external_graph) == 5:
-                    graph_dict = self.map.graph_dict_from_tigra(
-                        external_graph[0],
-                        external_graph[1],
-                        external_graph[2],
-                        external_graph[3],
-                        external_graph[4])
-                    _ = self.map.fill_empty_graph_from_dict(graph_dict)
-                    graph_dict = self.map.all_individuals_to_dict()
-                    if graph_dict != {}:
-                        self.logger.info("Init by importing a Tigramite Tuple has been successful.")
-                    else:
-                        self.logger.error("Importing the Tigramite Tuple did not result in any instantiation of individuals in the new graph.")
-                else:
-                    self.logger.error("Passed Tigramite Tuple has the wrong format. Please pass a Tuple with the Format " + 
-                    "(node_names, edge_names, link_matrix, q_matrix, timestep_len_s).")
+                    self.logger.error("Importing the Tigramite Tuple did not result in any instantiation of individuals in the new graph.")
             else:
-                self.logger.error("Wrong external graph format. Please pass a MultiDiGraph or Tigramite Tuple. " + 
-                "A empty causalgraph has been initialized.")
-
-        self.logger.info("Initialized the Graph.")
+                self.logger.error("Passed Tigramite Tuple has the wrong format. Please pass a Tuple with the Format " + 
+                "(node_names, edge_names, link_matrix, q_matrix, timestep_len_s).")
+        else:
+            self.logger.error("Wrong external graph format. Please pass a MultiDiGraph or Tigramite Tuple. " + 
+            "A empty causalgraph has been initialized.")
 
 
     def _init_store_backend_sqldb(self, sql_db_path: str, sql_exclusive: bool) -> owlready2.World:
@@ -136,7 +140,10 @@ class Graph():
         :rtype: owlready2.World
         """
         store = owlready2.World()
-        if Path(sql_db_path).is_file:
+        if sql_db_path is None:
+            self.logger.info(f"Using in memory ontology store. Graph will not be saved after stopping the program.")
+            return store
+        elif Path(sql_db_path).is_file():
             store.set_backend(filename=sql_db_path, exclusive=sql_exclusive)
             self.logger.warning(f"Using existing ontology store at {Path(sql_db_path).absolute()}")
         else:

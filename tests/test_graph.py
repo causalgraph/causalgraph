@@ -32,36 +32,34 @@ def fixture_sql_test_db(tmpdir) -> str:
 
 
 @pytest.fixture(name= "test_graph")
-def fixture_test_graph(sql_test_db) -> Graph:
-    test_graph = Graph(sql_db_filename=sql_test_db, sql_exclusive=False)
+def fixture_test_graph() -> Graph:
+    test_graph = Graph(sql_db_filename=None, sql_exclusive=False)
     yield test_graph
-    os.remove(sql_test_db)
 
 @pytest.fixture(name="test_graph_simple")
-def fixture_test_graph_simple(tmpdir) -> Graph:
-    graph = Graph(sql_db_filename=f'{tmpdir}/simple.sqlite3')
+def fixture_test_graph_simple() -> Graph:
+    graph = Graph(sql_db_filename=None)
     # Init creators
-    creator_name = graph.add.individual_of_type(class_of_individual="Creator",
+    creator_node = graph.add.individual_of_type(class_of_individual="Creator",
                                                 name_for_individual="master_creator",
                                                 comment=["Creates everything"])
-    creator_node = owl2utils.get_entity_by_name(creator_name, graph.store)
     # Add nodes
     graph.add.causal_node("node_1")
     graph.add.causal_node("node_2", comment=["node_2 comment"])
     graph.add.causal_node("node_3_c", hasCreator=[creator_node])
     # Add edges
-    graph.add.causal_edge(cause_node_name="node_1",
-                          effect_node_name="node_2",
+    graph.add.causal_edge(cause_node="node_1",
+                          effect_node="node_2",
                           name_for_edge="edge_1")
-    graph.add.causal_edge(cause_node_name="node_2",
-                          effect_node_name="node_3_c",
+    graph.add.causal_edge(cause_node="node_2",
+                          effect_node="node_3_c",
                           name_for_edge="edge_2_c",
                           confidence=1.0,
                           time_lag_s=5.0,
                           hasCreator=[creator_node],
                           comment=["edge_2c_comment"])
-    graph.add.causal_edge(cause_node_name= "node_2",
-                          effect_node_name= "node_3_c",
+    graph.add.causal_edge(cause_node= "node_2",
+                          effect_node= "node_3_c",
                           name_for_edge= "edge_3_c",
                           confidence=0.5,
                           time_lag_s=10.0,
@@ -90,7 +88,7 @@ def test_graph_lock(sql_test_db):
     graph_one.add.causal_node("cause_test_node")
     individuals_count_g_one = len(list(graph_one.store.individuals()))
     graph_one.store.save()
-    # Create new graph from same data base and count individuals
+    # Create new graph from same database and count individuals
     graph_two = Graph(sql_db_filename=sql_test_db, sql_exclusive=False)
     individuals_count_g_two = len(list(graph_two.store.individuals()))
     assert individuals_count_g_two > 0
@@ -98,7 +96,7 @@ def test_graph_lock(sql_test_db):
 
 
 def test_graph_preserved_prefix_after_reload(sql_test_db):
-    """Test taht individuals still exist and have the same name (including
+    """Test that individuals still exist and have the same name (including
     prefix) when creating a new graph"""
     graph_one = Graph(sql_db_filename=sql_test_db, sql_exclusive=False)
     # Add test node, save to disk, copy individuals
@@ -119,7 +117,7 @@ def test_graph_add_after_reload(sql_test_db):
     graph_one.add.causal_node("test_node")
     graph_one.store.save()
     # Create new graph and add another node
-    graph_two = Graph(sql_db_filename=sql_test_db, sql_exclusive=False)
+    graph_two = Graph(sql_db_filename=None, sql_exclusive=False)
     graph_two.add.causal_node("mayCauseError")
 
 
@@ -146,7 +144,7 @@ def test_import_ontology_from_url(test_graph: Graph):
 
 def test_import_ontology_from_wrong_url(test_graph: Graph):
     """Test that importing an ontology from a wrong url doesn't work"""
-    random_url= "https://www.google.com"
+    random_url= "https://www.google.de"
     assert test_graph.import_ontology(random_url) is None
 
 
@@ -163,21 +161,21 @@ def test_import_same_ontology_twice(test_graph: Graph, testdata_dir):
     num_ontos_after_second_load = len(test_graph.store.ontologies)
     assert num_ontos_after_first_load == num_ontos_after_second_load
 
-def test_import_ontology_at_startup(tmpdir: str, testdata_dir: str):
+def test_import_ontology_at_startup(testdata_dir: str):
     """Tests the import of ontologies when initializing a new Graph() object"""
     external_ontos = [f"{testdata_dir}/faults.owl", f"{testdata_dir}/error-db.owl", f"{testdata_dir}/pizza.owl"]
     G_new = Graph(
-        sql_db_filename=f"{tmpdir}/graph_onto_import.sqlite3",
+        sql_db_filename=None,
         external_ontos=external_ontos
     )
     assert G_new.map.third_party_data_properties != []
     assert G_new.map.third_party_object_properties != []
 
-def test_init_graph_from_nx(test_graph_simple: Graph, tmpdir: str):
+def test_init_graph_from_nx(test_graph_simple: Graph):
     """Tests the initialization of a new Graph() object from a passed NetworkX MultiDiGraph() object"""
     nx_graph = test_graph_simple.export.nx()
     G_new = Graph(
-        sql_db_filename=f"{tmpdir}/graph_nx_import.sqlite3",
+        sql_db_filename=None,
         external_graph=nx_graph
     )
     nx_graph_dict = G_new.map.graph_dict_from_nx(nx_graph)
@@ -185,12 +183,12 @@ def test_init_graph_from_nx(test_graph_simple: Graph, tmpdir: str):
     diff = DeepDiff(nx_graph_dict, new_graph_dict, ignore_order=True)
     assert diff == {}
 
-def test_init_graph_from_tigra(test_graph_simple: Graph, tmpdir: str):
+def test_init_graph_from_tigra(test_graph_simple: Graph):
     """Tests the initialization of a new Graph() object from a passed Tigramite graph representation"""
     node_names, edge_names, link_matrix, q_matrix, timestep_len_s = test_graph_simple.export.tigra()
     graph_simple_dict = test_graph_simple.map.all_individuals_to_dict()
     G_nx = Graph(
-        sql_db_filename=f"{tmpdir}/tigra_import.sqlite3",
+        sql_db_filename=None,
         external_graph=(node_names, edge_names, link_matrix, q_matrix, timestep_len_s)
     )
     tigra_graph_dict = G_nx.map.all_individuals_to_dict()
@@ -201,33 +199,33 @@ def test_init_graph_from_tigra(test_graph_simple: Graph, tmpdir: str):
     diff = DeepDiff(tigra_graph_dict, graph_simple_dict, ignore_order=True)
     assert diff == {}
 
-def test_init_graph_from_failed_tigra(tmpdir: str):
+def test_init_graph_from_failed_tigra():
     """Tests the initialization of a new Graph() object from a passed Tigramite graph representation.
     This Tigramite Tuple should result in a empty Graph()."""
     node_names, edge_names, link_matrix, q_matrix, timestep_len_s = [], [], np.ndarray([1, 2, 3, 4]), np.ndarray([1, 2, 3, 4]), 1
     G_nx = Graph(
-        sql_db_filename=f"{tmpdir}/tigra_import_failed.sqlite3",
+        sql_db_filename=None,
         external_graph=(node_names, edge_names, link_matrix, q_matrix, timestep_len_s)
     )
     tigra_graph_dict = G_nx.map.all_individuals_to_dict()
     assert tigra_graph_dict == {}
 
-def test_init_graph_from_wrong_tigra_format(tmpdir: str):
+def test_init_graph_from_wrong_tigra_format():
     """Tests the initialization of a new Graph() object from a passed Tigramite graph representation.
     This Tigramite Tuple should result in a empty Graph()."""
     node_names, edge_names = [], []
     G_nx = Graph(
-        sql_db_filename=f"{tmpdir}/tigra_import_w_format.sqlite3",
+        sql_db_filename=None,
         external_graph=(node_names, edge_names)
     )
     tigra_graph_dict = G_nx.map.all_individuals_to_dict()
     assert tigra_graph_dict == {}
 
-def test_init_graph_from_graph_format(tmpdir: str):
+def test_init_graph_from_graph_format():
     """Tests the initialization of a new Graph() object from a wrong graph representation.
     This should result in a empty Graph()."""
     G_nx = Graph(
-        sql_db_filename=f"{tmpdir}/import_w_format.sqlite3",
+        sql_db_filename=None,
         external_graph=[1,2,3]
     )
     tigra_graph_dict = G_nx.map.all_individuals_to_dict()

@@ -23,7 +23,7 @@
     </Annotation>
     <Annotation>
         <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
-        <Literal>0.0.1</Literal>
+        <Literal>0.0.2</Literal>
     </Annotation>
     <Declaration>
         <Class IRI="#Environment"/>
@@ -50,7 +50,13 @@
         <DataProperty IRI="#apiUrl"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#attachmentLinks"/>
+    </Declaration>
+    <Declaration>
         <DataProperty IRI="#communicatesWith"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#contentLink"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#errorCode"/>
@@ -77,7 +83,10 @@
         <DataProperty IRI="#role"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#thirdPartyName"/>
+        <DataProperty IRI="#schusterName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#severity"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#sqlDataProperties"/>
@@ -88,7 +97,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Error"/>
-        <Class IRI="http://iwu.fraunhofer.de/causalgraph/faults-extension#Fault_Event"/>
+        <Class IRI="http://iwu.fraunhofer.de/causalgraph/faults-extension#Fault_State"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Error"/>
@@ -145,7 +154,15 @@
         <DataProperty IRI="#sqlDataProperties"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
+        <DataProperty IRI="#attachmentLinks"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
         <DataProperty IRI="#communicatesWith"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#contentLink"/>
         <DataProperty IRI="#sqlDataProperties"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
@@ -181,7 +198,11 @@
         <DataProperty IRI="#sqlDataProperties"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
-        <DataProperty IRI="#thirdPartyName"/>
+        <DataProperty IRI="#schusterName"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#severity"/>
         <DataProperty IRI="#sqlDataProperties"/>
     </SubDataPropertyOf>
     <FunctionalDataProperty>
@@ -194,7 +215,13 @@
         <DataProperty IRI="#apiUrl"/>
     </FunctionalDataProperty>
     <FunctionalDataProperty>
+        <DataProperty IRI="#attachmentLinks"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
         <DataProperty IRI="#communicatesWith"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#contentLink"/>
     </FunctionalDataProperty>
     <FunctionalDataProperty>
         <DataProperty IRI="#errorCode"/>
@@ -221,7 +248,10 @@
         <DataProperty IRI="#role"/>
     </FunctionalDataProperty>
     <FunctionalDataProperty>
-        <DataProperty IRI="#thirdPartyName"/>
+        <DataProperty IRI="#schusterName"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#severity"/>
     </FunctionalDataProperty>
     <DataPropertyDomain>
         <DataProperty IRI="#additionalInformation"/>
@@ -236,8 +266,16 @@
         <Class IRI="#SqlTableEntry"/>
     </DataPropertyDomain>
     <DataPropertyDomain>
+        <DataProperty IRI="#attachmentLinks"/>
+        <Class IRI="#SqlTableEntry"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
         <DataProperty IRI="#communicatesWith"/>
         <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#contentLink"/>
+        <Class IRI="#SqlTableEntry"/>
     </DataPropertyDomain>
     <DataPropertyDomain>
         <DataProperty IRI="#errorCode"/>
@@ -272,8 +310,12 @@
         <Class IRI="#Environment"/>
     </DataPropertyDomain>
     <DataPropertyDomain>
-        <DataProperty IRI="#thirdPartyName"/>
+        <DataProperty IRI="#schusterName"/>
         <Class IRI="#Environment"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#severity"/>
+        <Class IRI="#Error"/>
     </DataPropertyDomain>
     <DataPropertyDomain>
         <DataProperty IRI="#sqlDataProperties"/>
@@ -292,12 +334,20 @@
         <Datatype abbreviatedIRI="xsd:string"/>
     </DataPropertyRange>
     <DataPropertyRange>
+        <DataProperty IRI="#attachmentLinks"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
         <DataProperty IRI="#communicatesWith"/>
         <Datatype abbreviatedIRI="xsd:string"/>
     </DataPropertyRange>
     <DataPropertyRange>
+        <DataProperty IRI="#contentLink"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
         <DataProperty IRI="#errorCode"/>
-        <Datatype abbreviatedIRI="xsd:int"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
     </DataPropertyRange>
     <DataPropertyRange>
         <DataProperty IRI="#finalName"/>
@@ -328,13 +378,25 @@
         <Datatype abbreviatedIRI="xsd:string"/>
     </DataPropertyRange>
     <DataPropertyRange>
-        <DataProperty IRI="#thirdPartyName"/>
+        <DataProperty IRI="#schusterName"/>
         <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#severity"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:int"/>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#int">0</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#maxInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#int">1000</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
     </DataPropertyRange>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#Environment</IRI>
-        <Literal xml:lang="en">Describes a hardware or software environment that generates data and events, especially fault events.</Literal>
+        <Literal xml:lang="en">Describes a hardware or software environment that generates data and can have fault states.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
@@ -378,6 +440,11 @@
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#attachmentLinks</IRI>
+        <Literal xml:lang="en">Contains a JSON holding the &quot;Name&quot; and &quot;URL&quot; of additional Attachments for the sql table entry.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#communicatesWith</IRI>
         <Literal xml:lang="en">List of other envrionments that the environments communicates with.</Literal>
     </AnnotationAssertion>
@@ -385,6 +452,11 @@
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#communicatesWith</IRI>
         <Literal xml:lang="en">communicatesWith</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#contentLink</IRI>
+        <Literal xml:lang="en">Conditional: Link to Rich-Text describing the sql-table-entry</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
@@ -433,8 +505,13 @@
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
-        <IRI>#thirdPartyName</IRI>
-        <Literal xml:lang="en">Name given by someone else for the Environment.</Literal>
+        <IRI>#schusterName</IRI>
+        <Literal xml:lang="en">Name given by Schuster for the Environment.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#severity</IRI>
+        <Literal xml:lang="en">Describes the severity of a fault in a scale between 0 and 1000. Severity: Level Mapping -&gt; 1: Info; 500:Warning; 1000:Error.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
@@ -451,3 +528,4 @@
 
 
 <!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

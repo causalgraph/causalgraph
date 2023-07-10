@@ -8,9 +8,11 @@ Store is equivalent to owlready2 World """
 # general imports
 from logging import Logger
 import owlready2
+from typing import Union
 # causalgraph imports
+import causalgraph.utils.owlready2_utils as owlutils
+from causalgraph.utils.misc_utils import strict_types
 from causalgraph.utils.logging_utils import init_logger
-from causalgraph.utils.owlready2_utils import entity_exists, get_entity_by_name, is_instance_of_class
 
 
 class Remove():
@@ -26,77 +28,82 @@ class Remove():
         self.logger.info("Initialized the 'remove' functionalities.")
 
 
-    def causal_node(self, individual_name: str) -> bool:
-        """Deletes an individual of the class "CausalNode" with the name "individual_name".
+    @strict_types
+    def causal_node(self, entity: Union[str, owlready2.Thing]) -> bool:
+        """Deletes an individual of the class "CausalNode" or its subtypes with the name "individual_name".
         If the node is connected with edges, these are deleted as well.
 
-        :param individual_name: name for individual
-        :type individual_name: str
+        :param entity: The individual object to be deleted or its name.
+        :type entity: Union[str, owlready2.Thing]
         :return: 'True' if delete successful
         :rtype: bool
         """
-        # return false if individual does not exist
-        if entity_exists(individual_name, self.store) is False:
+        # Check if individual exists and get its name and object
+        individual_name, individual_obj = owlutils.get_name_and_object(entity, self.store)
+        if individual_obj is None:
             self.logger.error(f"Individual '{individual_name}' does not exist.")
             return False
         # return false if individual is no CausalNode
-        entity_of_right_class = is_instance_of_class(individual_name, 'CausalNode', self.store, logger= self.logger)
+        entity_of_right_class = owlutils.is_instance_of_type(individual_name, 'CausalNode', self.store, include_subtypes=True, logger= self.logger)
         if entity_of_right_class is False:
-            self.logger.error(f"Individual '{individual_name}' is not of the class 'CausalNode'")
+            self.logger.error(f"Individual '{individual_name}' is not of the class 'CausalNode' or a subclass.")
             return False
         # Delete entity if both prerequisites are met
         causal_edges_list = self._list_of_all_causal_edges_from_one_node(individual_name)
         if len(causal_edges_list) > 0 :
             self.causal_edges_from_node(individual_name)
-        deletion_succ = self.delete_individual_of_type(str(individual_name), 'CausalNode')
+        deletion_succ = self.delete_individual_of_type(individual_name, 'CausalNode', include_subtypes=True)
         return deletion_succ
 
 
-    def causal_edge_by_name(self, causal_edge_name: str) -> bool:
-        """Deletes an individual of class "CausalEdge" with the name "causal_edge_name".
+    @strict_types
+    def causal_edge(self, causal_edge: Union[str, owlready2.Thing]) -> bool:
+        """Deletes an individual of class "CausalEdge" with the name "causal_edge" or
+        the specific CausalEdge object.
 
-        :param causal_edge_name: name for individual
-        :type causal_edge_name: str
+        :param causal_edge: The individual edge object to be deleted or its name.
+        :type causal_edge: Union[str, owlready2.Thing]
         :return: 'True' if delete successful
         :rtype: bool
         """
-        deletion_successful = self.delete_individual_of_type(str(causal_edge_name), 'CausalEdge')
+        deletion_successful = self.delete_individual_of_type(causal_edge, 'CausalEdge')
         return deletion_successful
 
 
-    def causal_edges(self, causal_node1: str, causal_node2:str) -> bool:
+    @strict_types
+    def causal_edges(self, causal_node1: Union[str, owlready2.Thing], causal_node2: Union[str, owlready2.Thing]) -> bool:
         """Deletes all CausalEdges between 'hasCause' and 'hasEffect'
 
-        :param causalNode1: name for individual 'hasCause' or 'hasEffect'
-        :type causalNode1: str
-        :param causalNode2: name for individual 'hasCause' or 'hasEffect'
-        :type causalNode2: str
+        :param causalNode1: First Node individual object of 'hasCause' or 'hasEffect'. Can also be just the name of it.
+        :type causalNode1: Union[str, owlready2.Thing]
+        :param causalNode2: Second Node individual object of 'hasCause' or 'hasEffect'. Can also be just the name of it.
+        :type causalNode2: Union[str, owlready2.Thing]
         :return: 'True' if deletion successful
         :rtype: bool
         """
-        possibly_existing_entity_cause = get_entity_by_name(causal_node1, self.store, self.logger)
-        possibly_existing_entity_effect = get_entity_by_name(causal_node2, self.store, self.logger)
-        cause_of_specified_class = is_instance_of_class(causal_node1, 'CausalNode', self.store, logger=self.logger)
-        effect_of_specified_class = is_instance_of_class(causal_node2, 'CausalNode', self.store, logger=self.logger)
-        # return false if one of the entities does not exist
-        if possibly_existing_entity_cause is None or possibly_existing_entity_effect is None:
+        causal_node1_name, causal_node1_obj = owlutils.get_name_and_object(causal_node1, self.store)
+        causal_node2_name, causal_node2_obj = owlutils.get_name_and_object(causal_node2, self.store)
+        # Return false if at least one of the nodes does not exist
+        if causal_node1_obj is None or causal_node2_obj is None:
             self.logger.error("Could not delete CausalEdges between " +
-                             f"{causal_node1}:{possibly_existing_entity_cause} and " +
-                             f"{causal_node2}:{possibly_existing_entity_effect}. " +
+                              f"[{causal_node1_name}|{causal_node1_obj}] and " +
+                              f"[{causal_node2_name}|{causal_node2_obj}]. " +
                               "One or more individuals does not exist.")
             return False
-        # return false if one of the entities is no CausalNode
+        # Return false if at least one node is not really a CausalNode
+        cause_of_specified_class = owlutils.is_instance_of_type(causal_node1_name, 'CausalNode', self.store, logger=self.logger, include_subtypes=True)
+        effect_of_specified_class = owlutils.is_instance_of_type(causal_node2_name, 'CausalNode', self.store, logger=self.logger, include_subtypes=True)
         if cause_of_specified_class is False or effect_of_specified_class is False:
-            self.logger.error(f"Could not delete CausalEdges between '{causal_node1}' and" +
-                              f"{causal_node2}. Individuals are not of the specified class" +
+            self.logger.error(f"Could not delete CausalEdges between '[{causal_node1_name}|{causal_node1_obj}]' and " +
+                              f"[{causal_node2_name}|{causal_node2_obj}]. Individuals are not of the specified class" +
                                "'CausalNode', they are specified as of the classes " +
-                              f"{possibly_existing_entity_cause.is_a} and " +
-                              f"{possibly_existing_entity_effect.is_a}.")
+                              f"{causal_node1_obj.is_a} and " +
+                              f"{causal_node2_obj.is_a}.")
             return False
         # Delete entity if both prerequisites are met, dedicated logging for each
-        edge_list = self._causal_edges_btw_nodes(causal_node1, causal_node2)
+        edge_list = self._causal_edges_btw_nodes(causal_node1_name, causal_node2_name)
         if not edge_list:
-            self.logger.error(f"No edges were deleted between {causal_node1} and {causal_node2}.")
+            self.logger.error(f"No edges were deleted between '{causal_node1_name}' and '{causal_node2_name}'.")
             return True
         for edge in edge_list:
             edge = (str(edge).replace(f'[{self.individuals_onto_prefix}.','').replace(']',''))
@@ -104,74 +111,115 @@ class Remove():
         return True
 
 
-    def causal_edges_from_node(self, causal_node: str) -> bool:
+    @strict_types
+    def causal_edges_from_node(self, causal_node: Union[str, owlready2.Thing]) -> bool:
         """Deletes all CausalEdges which are connected with 'causal_node'
 
-        :param causalNode: class name/type of individual
+        :param causalNode: Object or name of the affected CausalNode
         :type causalNode: str
         :return: 'True' if delete successful
         :rtype: bool
         """
-        # return false if individual does not exist
-        if entity_exists(causal_node, self.store) is False:
-            self.logger.error(f"Individual '{causal_node}' does not exist.")
+        causal_node_name, causal_node_obj = owlutils.get_name_and_object(causal_node, self.store)
+        # Return false if individual does not exist
+        if causal_node_obj is None:
+            self.logger.error(f"Individual '[{causal_node_name}|{causal_node_obj}]' does not exist.")
             return False
-        # return false if individual is no CausalNode
-        entity_of_right_class = is_instance_of_class(causal_node, 'CausalNode', self.store, logger= self.logger)
+        # Return false if individual is no CausalNode
+        entity_of_right_class = owlutils.is_instance_of_type(causal_node_name, 'CausalNode', self.store, logger=self.logger, include_subtypes=True)
         if entity_of_right_class is False:
-            self.logger.error(f"Individual '{causal_node}' is not of the class 'CausalNode'")
+            self.logger.error(f"Individual '{causal_node_name}' is not of the class 'CausalNode'")
             return False
         # Delete edges if both prerequisites are met
-        edge_list = self._list_of_all_causal_edges_from_one_node(causal_node)
+        edge_list = self._list_of_all_causal_edges_from_one_node(causal_node_name)
         if not edge_list:
-            self.logger.warning(f"No edges were deleted at '{causal_node}'.")
+            self.logger.warning(f"No edges were deleted at '{causal_node_name}'.")
             return True
         for edge in edge_list:
-            edge = (str(edge).replace(f'[{self.individuals_onto_prefix}.','').replace(']',''))
-            self.delete_individual_of_type(edge, 'CausalEdge')
+            self.delete_individual_of_type(edge[0], 'CausalEdge')
         return True
 
 
-    def delete_individual_of_type(self, individual_name: str, class_of_individual: str) -> bool:
+    @strict_types
+    def delete_individual_of_type(self, individual: Union[str, owlready2.Thing], type_of_individual: Union[str, owlready2.EntityClass], include_subtypes = False) -> bool:
         """Deletes an individual of the specified class/type.
 
-        :param class_of_individual: class name/type of individual
-        :type class_of_individual: str
-        :param name_for_individual: name for individual
-        :type name_for_individual: str
+        :param individual: The object to be deleted or its name.
+        :type individual: Union[str, owlready2.Thing],
+        :param type_of_individual: Class name or owlready EntityClass object of individual class.
+        :type type_of_individual: Union[str, owlready2.EntityClass]
+        :param include_subtypes: Switch to also include subtypes of typename in check, defaults to False
+        :type include_subtypes: bool
         :return: 'True' if delete successful
         :rtype: bool
         """
-        # return false if individual does not exist
-        if entity_exists(individual_name, self.store) is False:
+        individual_name, individual_obj = owlutils.get_name_and_object(individual, self.store)
+        # Check if individual (still) exists
+        if individual_obj is None:
             self.logger.error(f"Did not delete {individual_name} because it does not exist")
             return False
         # return false if individual is not of the right class
-        entity_of_right_class = is_instance_of_class(individual_name, class_of_individual, self.store, logger= self.logger)
+        type_name, type_obj = owlutils.get_name_and_object(type_of_individual, self.store)
+        entity_of_right_class = owlutils.is_instance_of_type(individual_name, type_obj, self.store, include_subtypes=include_subtypes, logger=self.logger)
         if entity_of_right_class is False:
-            self.logger.error("Could not delete individual. Individual not of specified class." +
-                             f"{individual_name} is of class '{class_of_individual}")
+            subclasses = owlutils.get_subclasses(type_obj, self.store, self.logger)
+            if include_subtypes == True:
+                error_msg = f"""Could not delete individual. Individual not of specified class or any of its subtypes.
+                          '{individual_name}' is of class(es) '{individual_obj.is_a}'. Passed Class '{type_name}' or any of it's subclasses '{subclasses}'."""
+            else:
+                error_msg = f"""Could not delete individual. Individual not of specified class.
+                          '{individual_name}' is of class(es) '{individual_obj.is_a}'. Passed Class '{type_name}'. Use option 'include_subtypes=True' if you also want to allow removal for subclasses of '{type_name}' """
+            self.logger.error(error_msg)
             return False
-        # Delete entity if both prerequisites are met
-        entity = get_entity_by_name(individual_name, self.store, self.logger)
-        owlready2.destroy_entity(entity)
-        self.logger.info(f"Deleted individual {individual_name} of class {class_of_individual}")
+        # Delete entity if both prerequisites are met based on type
+        owlready2.destroy_entity(individual_obj)
+        self.logger.info(f"Deleted entity '{individual_name}' of class '{individual_obj.is_a}'")
         self.store.save()
         return True
 
 
-    def _causal_edges_btw_nodes(self, causal_node1: str, causal_node2: str) -> list:
+    @strict_types
+    def entity(self, entity: Union[str, owlready2.Thing]) -> bool:
+        """Removes entity from store. Entity can be provided as object or as string identifer.
+
+        :param entity: Entity to remove
+        :type entity: owlready2.Thing | str
+        :return: deletion successful
+        :rtype: bool
+        """
+        # Check Inputs and if entity exists in store
+        if type(entity)==str:
+            entity_str = entity
+            entity = owlutils.get_entity_by_name(entity, self.store, self.logger, suppress_warn=True)
+        elif type(entity) in list(self.store.classes()):
+            entity_str = entity.get_name()
+        else:
+            self.logger.error(f"Did not delete '{entity}' because it was not found in store.")
+            return False
+        # Check Type of entity in case special treatment necessary
+        if owlutils.is_instance_of_type(entity_str, 'CausalNode', self.store, include_subtypes=True, logger=self.logger):
+            return self.causal_node(entity_str)
+        elif owlutils.is_instance_of_type(entity_str, 'CausalEdge', self.store, include_subtypes=True, logger=self.logger):
+            return self.causal_edge(entity_str)
+        else:
+            owlready2.destroy_entity(entity)
+            self.logger.info(f"Deleted entity '{entity_str}' of class '{entity.is_a}'")
+            self.store.save()
+            return True
+
+
+    def _causal_edges_btw_nodes(self, causal_node1: Union[str, owlready2.Thing], causal_node2: Union[str, owlready2.Thing]) -> list:
         """ Returns a list of all CausalEdges between 'causal_node1' and 'causal_node2'
 
-        :param causal_node1: name for individual 'hasCause' or 'hasEffect'
-        :type causal_node1: str
-        :param causal_node2: name for individual 'hasCause' or 'hasEffect'
-        :type causal_node2: str
+        :param causal_node1: First Node individual object of 'hasCause' or 'hasEffect'. Can also be just the name of it.
+        :type causal_node1: Union[str, owlready2.Thing]
+        :param causal_node2: Second Node individual object of 'hasCause' or 'hasEffect'. Can also be just the name of it.
+        :type causal_node2: Union[str, owlready2.Thing]
         :return: a list of all edges between 'hasCause' and 'hasEffect'
         :rtype: list of all causal_edges
         """
-        causal_node1_iri = get_entity_by_name(causal_node1, self.store, self.logger).iri
-        causal_node2_iri = get_entity_by_name(causal_node2, self.store, self.logger).iri
+        causal_node1_iri = owlutils.get_entity_by_name(causal_node1, self.store, self.logger).iri
+        causal_node2_iri = owlutils.get_entity_by_name(causal_node2, self.store, self.logger).iri
         list_causal_edges = list(self.store.sparql("""
             SELECT ?CausalEdge
             WHERE {
@@ -201,7 +249,7 @@ class Remove():
         :rtype: list
         """
         # get nodes that are connected to the specified node via incoming or outgoing edges
-        causal_node_iri = get_entity_by_name(causal_node, self.store, self.logger).iri
+        causal_node_iri = owlutils.get_entity_by_name(causal_node, self.store, self.logger).iri
         list_nodes_has_cause = list(self.store.sparql ("""
             SELECT ?CausalEdge
             WHERE {

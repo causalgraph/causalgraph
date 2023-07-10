@@ -12,7 +12,6 @@ import numpy as np
 import networkx as nx
 # causalgraph and owlready imports
 import causalgraph.graph as cg
-import owlready2
 from causalgraph.utils.logging_utils import init_logger
 
 
@@ -22,6 +21,7 @@ class Load():
     """
     def __init__(self, graph, logger: Logger = None) -> None:
         self.graph = graph
+        self.validate_domain_range = graph.validate_domain_range
         if logger is not None:
             self.logger = logger
         else:
