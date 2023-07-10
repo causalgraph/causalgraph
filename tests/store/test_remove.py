@@ -8,6 +8,7 @@
 # general imports
 import os
 import pytest
+from pathlib import Path
 # causalgraph imports
 from causalgraph import Graph
 from causalgraph.utils.owlready2_utils import get_entity_by_name
@@ -18,16 +19,22 @@ from causalgraph.utils.owlready2_utils import count_instances_of_type
 ###         Fixtures                 ###
 ########################################
 # Temporary sql_db for every test
-@pytest.fixture(name= "sql_test_db_path")
+@pytest.fixture(name="sql_test_db_path")
 def fixture_sql_test_db_path(tmpdir) -> str:
     test_db_relative_path = os.path.join(tmpdir, "test_remove.sqlite3")
     yield test_db_relative_path
     os.remove(test_db_relative_path)
 
-# Create Graph class with access to add and remove
-@pytest.fixture(name= "graph")
-def fixture_graph(sql_test_db_path) -> Graph:
-    graph = Graph(sql_db_filename=sql_test_db_path)
+@pytest.fixture(name="testdata_dir")
+def fixture_testdata_dir() -> Path:
+    testdata_dir = Path(__file__).absolute().parent.parent / 'testdata'
+    return testdata_dir
+
+# (On Memory) Create Graph class with access to add and remove and with faults onto
+@pytest.fixture(name="graph")
+def fixture_graph(testdata_dir) -> Graph:
+    faults_onto_path = str(Path.joinpath(testdata_dir, 'faults.owl'))
+    graph = Graph(sql_db_filename=None, external_ontos=[faults_onto_path])
     yield graph
     graph.store.close()
 
@@ -36,8 +43,7 @@ def fixture_graph(sql_test_db_path) -> Graph:
 ###              Tests               ###
 ########################################
 def test_delete_calling_with_none(graph: Graph):
-    should_be_false = graph.remove.delete_individual_of_type(None, None)
-    assert should_be_false is False
+    assert graph.remove.delete_individual_of_type(None, None) == False
 
 
 ## Test remove causal_nodes function
@@ -66,17 +72,31 @@ def test_remove_multiple_causalnodes(graph: Graph):
     assert causal_nodes_after == 0
 
 
-def test_causalnode_delete_of_incorrect_type(graph: Graph):
-    """Test that remove.causal_node() only works for nodes and not other types"""
-    # Expected behavior: Instance not deleted, as of wrong class ("Event"),  returnes False
-    instance_name = graph.add.individual_of_type("Event")
-    causal_nodes_before = count_instances_of_type("CausalNode", graph.store)
-    # Try to delete a causal node with the same name as event node:
+def test_causalnode_delete_of_non_causal_type(graph: Graph):
+    """Test that remove.causal_node() only works for causal nodes and subclasses and not other types"""
+    # Expected behavior: Instance not deleted, as of wrong class ("Creator"),  returnes False
+    instance_name = graph.add.individual_of_type("Creator")
+    causal_nodes_before = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    # Try to delete a causal node with the same name as creator node:
     delete_success = graph.remove.causal_node(instance_name)
-    causal_nodes_after = count_instances_of_type("CausalNode", graph.store)
+    causal_nodes_after = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
     # Assert that no causal node is deleted and that 'None' is returned
     assert (causal_nodes_after and causal_nodes_before) == 0
     assert delete_success is False
+
+def test_causalnode_delete_of_causal_node_subclass(graph: Graph):
+    # Expected behavior: Instance is deleted, as Event is subclass of CausalNode, returns True
+    # Create Node and assert is causal
+    causal_nodes_start = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    instance_name = graph.add.individual_of_type("Event") ## Event is a subclass of CausalNode
+    causal_nodes_after_creation = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    assert causal_nodes_after_creation == causal_nodes_start + 1, "Event creation was not detected as CausalNode Creation"
+    # Try to delete a causal node with the same name as event node:
+    delete_success = graph.remove.causal_node(instance_name)
+    causal_nodes_after_deletion = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    # Assert that no causal node is deleted and that 'None' is returned
+    assert causal_nodes_after_deletion == causal_nodes_after_creation - 1, "Event Node with not detected as CausalNode and therefore not deleted"
+    assert delete_success is True
 
 
 def test_delete_a_node_with_a_wrong_class(graph: Graph):
@@ -94,28 +114,71 @@ def test_causalnode_delete_from_a_reloaded_graph(sql_test_db_path: str):
     """Test that an individual can be deleted from a reloaded graph as well"""
     # Setup old Graph and add a causal node
     graph = Graph(sql_db_filename=sql_test_db_path)
-    causal_node_name = graph.add.causal_node("cause")
+    causal_node = graph.add.causal_node("cause")
     num_causal_nodes = count_instances_of_type("CausalNode", graph.store)
     graph.store.save()
     graph_new = Graph(sql_db_filename=sql_test_db_path)
     reloaded_num_causal_nodes = count_instances_of_type("CausalNode", graph_new.store)
     assert num_causal_nodes == reloaded_num_causal_nodes
-    assert get_entity_by_name(causal_node_name, graph_new.store) is not None
+    assert get_entity_by_name(causal_node.name, graph_new.store) is not None
     # Try to delete a causal node from the reloaded graph
-    graph_new.remove.causal_node(causal_node_name)
+    graph_new.remove.causal_node(causal_node)
     # Assert that this causal node was deleted
     assert (reloaded_num_causal_nodes - 1) == count_instances_of_type("CausalNode", graph_new.store)
-    assert get_entity_by_name(causal_node_name, graph_new.store) is None
+    assert get_entity_by_name(causal_node.name, graph_new.store) is None
 
 
 ### Test for Removing Causal Edges
+def test_remove_causal_edge_by_name_with_causal_subclass(graph: Graph):
+    """Test if remove causal_edge_by_name() works also with causal_subclass """
+    # Create Nodes and edges and count
+    cause = graph.add.causal_node()
+    event = graph.add.individual_of_type("Event")  ## Event is a subclass of CausalNode
+    edge = graph.add.causal_edge(cause, event)
+    causal_edges_before = count_instances_of_type("CausalEdge", graph.add.store, include_subtypes=True)
+    # Delete and assert
+    deletion_success = graph.remove.causal_edge(edge)
+    causal_edges_after = count_instances_of_type("CausalEdge", graph.add.store, include_subtypes=True)
+    assert deletion_success == True
+    assert causal_edges_after == causal_edges_before - 1
+
+
+def test_remove_causal_edges_with_causal_subclass(graph: Graph):
+    """Test if remove causal_edges() works also with causal_subclass """
+    # Create Nodes and edges and count
+    cause = graph.add.causal_node()
+    event = graph.add.individual_of_type("Event")  ## Event is a subclass of CausalNode
+    edge1 = graph.add.causal_edge(cause, event, time_lag_s=0.2)
+    edge2 = graph.add.causal_edge(cause, event, time_lag_s=2.0)
+    causal_edges_before = count_instances_of_type("CausalEdge", graph.add.store, include_subtypes=True)
+    # Delete and assert
+    deletion_success = graph.remove.causal_edges(cause, event)
+    causal_edges_after = count_instances_of_type("CausalEdge", graph.add.store, include_subtypes=True)
+    assert deletion_success == True, "Causal Edges were not deleted, probably because Event-Node was not detected as CausalNode."
+    assert causal_edges_after == causal_edges_before - 2
+
+
+def test_remove_causal_edges_from_node_with_causal_subclass(graph: Graph):
+    """Test if remove causal_edge_from_node() works also with causal_subclass """
+    # Create Nodes and edges and count
+    cause = graph.add.causal_node()
+    event = graph.add.individual_of_type("Event")  ## Event is a subclass of CausalNode
+    edge = graph.add.causal_edge(cause, event)
+    causal_edges_before = count_instances_of_type("CausalEdge", graph.add.store, include_subtypes=True)
+    # Delete and assert
+    deletion_success = graph.remove.causal_edges_from_node(event)
+    causal_edges_after = count_instances_of_type("CausalEdge", graph.add.store, include_subtypes=True)
+    assert deletion_success == True, "Causal Edge was not deleted, probably because Event-Node was not detected as CausalNode."
+    assert causal_edges_after == causal_edges_before - 1
+
+
 def test_remove_edge_from_non_existing_causalnode(graph: Graph):
     """Test that an edge can only be deleted if the nodes it connects exist"""
     # Expected behavior: False should be returned if cause_node or effect_node does not exist
     cause_node = graph.add.causal_node()
     effect_node = graph.add.causal_node()
     graph.add.causal_edge(cause_node, effect_node)
-    # Testing if False is returned if one of the edges does not exist
+    # Testing if False is returned if one of the node does not exist
     graph.remove.causal_node(cause_node)
     should_be_false = graph.remove.causal_edges(cause_node, effect_node)
     assert should_be_false is False
@@ -133,7 +196,7 @@ def test_remove_multiple_causaledges_with_name(graph: Graph):
     assert causal_edge_added == num_of_causal_edge_creations
     # deletes 5 nodes from the graph
     for i in range(num_of_causal_edge_creations):
-        graph.remove.causal_edge_by_name(str(i))
+        graph.remove.causal_edge(str(i))
     causal_edge_after = count_instances_of_type("CausalEdge", graph.store)
     # Assert that all causal edges are deleted
     assert causal_edge_after == 0
@@ -297,3 +360,72 @@ def test_delete_individual_of_type(graph: Graph):
     nodes_after = count_instances_of_type("Creator", graph.store)
     # Assertation that "creator_node" of class "Creator" is deleted
     assert nodes_after == 0
+
+def test_delete_individual_of_type_including_subclasses(graph: Graph):
+    """Test that an individual of type Fault is delete as a subsubclass of causalNode"""
+    # Create the node "event" of class "Event"
+    event = graph.add.individual_of_type('Event')  # is subclass of CausalNode
+    nodes_before = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    assert nodes_before == count_instances_of_type("Event", graph.store), "Event Node was not detected as CausalNode or not created."
+    # Deletes "event" node as subclas of a CausalNode
+    deletion_success = graph.remove.delete_individual_of_type(event,"CausalNode", include_subtypes=True)
+    nodes_after = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    # Assertions
+    assert deletion_success == True, "Event was not deletable as Subclass of CausalNode"
+    assert nodes_after == nodes_before - 1
+
+def test_delete_individual_of_type_including_subsubclasses(graph: Graph):
+    """Test that an individual of type Fault is delete as a subsubclass of causalNode"""
+    # Create the node "fault_state" of class "Fault_State"
+    fault = graph.add.individual_of_type('Fault_State')  # is subclass of CausalNode
+    nodes_before = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    assert nodes_before == count_instances_of_type("Fault_State", graph.store), "Fault_State Node was not detected as CausalNode or not created."
+    # Deletes "fault_state" node as subclass of "CausalNode"
+    deletion_success = graph.remove.delete_individual_of_type(fault,"CausalNode", include_subtypes=True)
+    nodes_after = count_instances_of_type("CausalNode", graph.store, include_subtypes=True)
+    # Assertions
+    assert deletion_success == True, "Fault_State was not deletable as SubSubclass of CausalNode"
+    assert nodes_after == nodes_before - 1
+
+def test_remove_entity_by_name(graph: Graph):
+    """Test that an individuals removed"""
+    # Create the node "fault_state" of class "Fault_State"
+    fault_obj = graph.add.individual_of_type('Fault_State')  # is subclass of CausalNode
+    fault_name = fault_obj.name
+    nodes_before = count_instances_of_type("Fault_State", graph.store, include_subtypes=True)
+    deletion_success = graph.remove.entity(fault_name)
+    nodes_after = count_instances_of_type("Fault_State", graph.store, include_subtypes=True)
+    # Assertions
+    assert deletion_success == True, "Fault_State instance was not removed"
+    assert nodes_after == nodes_before - 1
+
+def test_remove_entity_object_input(graph: Graph):
+    """Test that an individuals removed"""
+    # Create the node "fault_state" of class "Fault_State"
+    fault = graph.add.individual_of_type('Fault_State')  # is subclass of CausalNode
+    nodes_before = count_instances_of_type("Fault_State", graph.store, include_subtypes=True)
+    # Deletes "fault_state" node 
+    deletion_success = graph.remove.entity(fault)
+    nodes_after = count_instances_of_type("Fault_State", graph.store, include_subtypes=True)
+    # Assertions
+    assert deletion_success == True, "Fault_State instance was not removed"
+    assert nodes_after == nodes_before - 1
+
+def test_remove_entity_causal_node_detection(graph: Graph):
+    """Test that an individuals removed"""
+    # Create the node "fault_state" of class "Fault_State"
+    fault = graph.add.individual_of_type('Fault_State')  # is subclass of CausalNode
+    effect = graph.add.causal_node("effect")
+    nodes_before_edge = len(list(graph.store.individuals()))
+    edge = graph.add.causal_edge(fault, effect)
+    nodes_with_edge = len(list(graph.store.individuals()))
+    assert nodes_with_edge == nodes_before_edge + 1, f"Not exactly one edge was added to individuals. Individuals: {list(graph.store.individuals())}"
+    # Deletes "fault" node 
+    print(f"Individuals before removal: {list(graph.store.individuals())}")
+    deletion_success = graph.remove.entity(fault)
+    nodes_after_removal = len(list(graph.store.individuals()))
+    # Assertions
+    assert deletion_success == True, "Fault_State instance was not removed"
+    assert nodes_after_removal == nodes_before_edge - 1, f"Remove entity did not remove CausalNode and Edge. Individuals after removal: {list(graph.store.individuals())}"
+
+    

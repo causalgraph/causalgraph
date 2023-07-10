@@ -10,7 +10,7 @@ import os
 import logging
 import ecs_logging
 # causalgraph imports
-from causalgraph.utils.path_utils import get_project_root
+from causalgraph.utils.misc_utils import get_project_root
 
 
 def init_logger(logger_name: str,

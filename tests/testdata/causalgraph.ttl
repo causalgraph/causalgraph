@@ -1,226 +1,266 @@
-@prefix : <urn:absolute:causalgraph#> .
+@prefix : <http://iwu.fraunhofer.de/causalgraph> .
+@prefix cg: <http://iwu.fraunhofer.de/causalgraph#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <urn:absolute:causalgraph> .
+@base <http://iwu.fraunhofer.de/causalgraph> .
 
-<urn:absolute:causalgraph> rdf:type owl:Ontology .
+<http://iwu.fraunhofer.de/causalgraph> rdf:type owl:Ontology ;
+                                        rdfs:comment "Causalgraph-ontology with basic concepts for CausalNodes and CausalEdges. Part of PyPi Package at https://pypi.org/project/causalgraph/"@en ;
+                                        rdfs:label "causalgraph-ontology"@en ;
+                                        owl:versionInfo "0.14"@en .
 
 #################################################################
 #    Object Properties
 #################################################################
 
-###  urn:absolute:causalgraph#created
-:created rdf:type owl:ObjectProperty ;
-         owl:inverseOf :created ;
-         rdfs:domain :Creator ;
-         rdfs:range :CausalEdge ,
-                    :CausalNode .
+###  http://iwu.fraunhofer.de/causalgraph#created
+cg:created rdf:type owl:ObjectProperty ;
+           rdfs:subPropertyOf owl:topObjectProperty ;
+           owl:inverseOf cg:hasCreator ;
+           rdfs:domain cg:Creator ;
+           rdfs:range cg:CausalEdge ,
+                      cg:CausalNode .
 
 
-###  urn:absolute:causalgraph#hasCausalConnection
-:hasCausalConnection rdf:type owl:ObjectProperty ;
-                     rdfs:subPropertyOf owl:topObjectProperty ;
-                     rdf:type owl:SymmetricProperty .
+###  http://iwu.fraunhofer.de/causalgraph#hasCausalConnection
+cg:hasCausalConnection rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf owl:topObjectProperty ;
+                       rdf:type owl:SymmetricProperty .
 
 
-###  urn:absolute:causalgraph#hasCause
-:hasCause rdf:type owl:ObjectProperty ;
-          rdfs:subPropertyOf :hasCausalConnection ;
-          owl:inverseOf :isCausing ;
-          rdfs:domain :CausalEdge ;
-          rdfs:range :CausalNode .
-
-
-###  urn:absolute:causalgraph#hasComponent
-:hasComponent rdf:type owl:ObjectProperty .
-
-
-###  urn:absolute:causalgraph#hasCreator
-:hasCreator rdf:type owl:ObjectProperty ;
-            rdfs:subPropertyOf owl:topObjectProperty ;
+###  http://iwu.fraunhofer.de/causalgraph#hasCause
+cg:hasCause rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf cg:hasCausalConnection ;
+            owl:inverseOf cg:isCausing ;
             rdf:type owl:FunctionalProperty ;
-            rdfs:domain :CausalEdge ,
-                        :CausalNode ;
-            rdfs:range :Creator .
+            rdfs:domain cg:CausalEdge ;
+            rdfs:range cg:CausalNode ;
+            rdfs:comment "A CausalEdge can only have a single 'cause' indicated via the functional 'hasCause' property."@en .
 
 
-###  urn:absolute:causalgraph#hasEffect
-:hasEffect rdf:type owl:ObjectProperty ;
-           rdfs:subPropertyOf :hasCausalConnection ;
-           owl:inverseOf :isAffectedBy ;
-           rdfs:domain :CausalEdge ;
-           rdfs:range :CausalNode .
+###  http://iwu.fraunhofer.de/causalgraph#hasComponent
+cg:hasComponent rdf:type owl:ObjectProperty .
 
 
-###  urn:absolute:causalgraph#isAffectedBy
-:isAffectedBy rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf :hasCausalConnection ;
-              rdfs:domain :CausalNode ;
-              rdfs:range :CausalEdge .
+###  http://iwu.fraunhofer.de/causalgraph#hasCreator
+cg:hasCreator rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdfs:domain cg:CausalEdge ,
+                          cg:CausalNode ;
+              rdfs:range cg:Creator .
 
 
-###  urn:absolute:causalgraph#isCausing
-:isCausing rdf:type owl:ObjectProperty ;
-            rdfs:subPropertyOf :hasCausalConnection ;
-            rdfs:domain :CausalNode ;
-            rdfs:range :CausalEdge .
+###  http://iwu.fraunhofer.de/causalgraph#hasEffect
+cg:hasEffect rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf cg:hasCausalConnection ;
+             owl:inverseOf cg:isAffectedBy ;
+             rdf:type owl:FunctionalProperty ;
+             rdfs:domain cg:CausalEdge ;
+             rdfs:range cg:CausalNode ;
+             rdfs:comment "A CausalEdge can only have a single 'effect' indicated via the functional 'hasEffect' property."@en .
+
+
+###  http://iwu.fraunhofer.de/causalgraph#isAffectedBy
+cg:isAffectedBy rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf cg:hasCausalConnection ;
+                rdfs:domain cg:CausalNode ;
+                rdfs:range cg:CausalEdge ;
+                rdfs:comment "A CausalNode can be influenced by many  'causes'  indicated via different CausalEdges pointing toward a CausalNode. All Edges influencing the CausalNode are gathered via the 'isAffectedBy' property."@en .
+
+
+###  http://iwu.fraunhofer.de/causalgraph#isCausing
+cg:isCausing rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf cg:hasCausalConnection ;
+             rdfs:domain cg:CausalNode ;
+             rdfs:range cg:CausalEdge ;
+             rdfs:comment "A CausalNode can influence many  'effects'  indicated via different CausalEdges being caused by a CausalNode. All Edges influenced from the CausalNode are gathered via the 'isCausing' property."@en .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://iwu.fraunhofer.de/causalgraph#hasConfidence
+cg:hasConfidence rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdf:type owl:FunctionalProperty ;
+                 rdfs:domain cg:CausalEdge ;
+                 rdfs:range xsd:double ,
+                            [ rdf:type rdfs:Datatype ;
+                              owl:onDatatype xsd:double ;
+                              owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:double
+                                                     ]
+                                                     [ xsd:maxInclusive "1.0"^^xsd:double
+                                                     ]
+                                                   )
+                            ] ;
+                 owl:propertyDisjointWith cg:hasTimeLag ;
+                 rdfs:comment "Functional property of a CausalEdge. Measures the Creator's confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge's existence, while 0.0 means that this particular edge is not present."@en .
+
+[ rdf:type owl:Axiom ;
+   owl:annotatedSource cg:hasConfidence ;
+   owl:annotatedProperty rdfs:range ;
+   owl:annotatedTarget [ rdf:type rdfs:Datatype ;
+                         owl:onDatatype xsd:double ;
+                         owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:double
+                                                ]
+                                                [ xsd:maxInclusive "1.0"^^xsd:double
+                                                ]
+                                              )
+                       ] ;
+   rdfs:comment "Confidence only allows values between 0.0 and 1.0."@en
+ ] .
+
+
+###  http://iwu.fraunhofer.de/causalgraph#hasTimeLag
+cg:hasTimeLag rdf:type owl:DatatypeProperty ;
+              rdfs:subPropertyOf owl:topDataProperty ;
+              rdf:type owl:FunctionalProperty ;
+              rdfs:domain cg:CausalEdge ;
+              rdfs:range xsd:double ,
+                         [ rdf:type rdfs:Datatype ;
+                           owl:onDatatype xsd:double ;
+                           owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:double
+                                                  ]
+                                                )
+                         ] ;
+              rdfs:comment "Functional property of a CausalEdge. Measures in SECONDS,  the time lag between cause and the effect to take place. Only positive values are allowed, which means that the effect always occurs after the effect."@en .
 
 
 #################################################################
 #    Classes
 #################################################################
 
-###  urn:absolute:causalgraph#CausalEdge
-:CausalEdge rdf:type owl:Class ;
-            owl:disjointWith :CausalNode ;
-            rdfs:comment "Causal Edges connect two Causal Nodes and contain the information about the causal direction, as well as properties describing the nature of the causal connection."@en ;
-            rdfs:label "CausalEdge"@en .
+###  http://iwu.fraunhofer.de/causalgraph#CausalEdge
+cg:CausalEdge rdf:type owl:Class ;
+              owl:disjointWith cg:CausalNode ;
+              rdfs:comment "Causal Edges connect two Causal Nodes and contain information about the causal direction, as well as properties describing the nature of the causal connection."@en ;
+              rdfs:label "CausalEdge"@en .
 
 
-###  urn:absolute:causalgraph#CausalGraph
-:CausalGraph rdf:type owl:Class ;
-             owl:equivalentClass [ owl:intersectionOf ( [ rdf:type owl:Restriction ;
-                                                          owl:onProperty :hasComponent ;
-                                                          owl:someValuesFrom :CausalEdge
-                                                        ]
-                                                        [ rdf:type owl:Restriction ;
-                                                          owl:onProperty :hasComponent ;
-                                                          owl:someValuesFrom :CausalNode
-                                                        ]
-                                                      ) ;
-                                   rdf:type owl:Class
-                                 ] ;
-             rdfs:comment "Causal Graphs consist of Causal Edges and Causal Nodes. Depending on the infomation attached to the Causal Edges, it is classified into Causal Graphical Models (CGM) oder Structural Causal Model (SCM). If it falls in between, as not all Causal Edges contain Structural Equations, it is called Hybrid Causal Model (HCM)."@en ;
-             rdfs:label "CausalGraph"@en .
+###  http://iwu.fraunhofer.de/causalgraph#CausalGraph
+cg:CausalGraph rdf:type owl:Class ;
+               owl:equivalentClass [ owl:intersectionOf ( [ rdf:type owl:Restriction ;
+                                                            owl:onProperty cg:hasComponent ;
+                                                            owl:someValuesFrom cg:CausalEdge
+                                                          ]
+                                                          [ rdf:type owl:Restriction ;
+                                                            owl:onProperty cg:hasComponent ;
+                                                            owl:someValuesFrom cg:CausalNode
+                                                          ]
+                                                        ) ;
+                                     rdf:type owl:Class
+                                   ] ;
+               rdfs:comment """Causal Graphs consist of Causal Edges and Causal Nodes. 
+In future releases the graph will be further classified into Causal Graphical Models (CGM) or Structural Causal Model (SCM), depending on the information attaches to its nodes. If it falls in between, as not all Causal Edges contain Structural Equations, it is called Hybrid Causal Model (HCM)."""@en ;
+               rdfs:label "CausalGraph"@en .
 
 
-###  urn:absolute:causalgraph#CausalGraphicalModel
-:CausalGraphicalModel rdf:type owl:Class ;
-                      rdfs:subClassOf :CausalGraph ;
-                      rdfs:comment "A Causal Graph WITHOUT functions / structural equations attached to ANY of its causal edges."@en ;
-                      rdfs:label "CausalGraphicalModel"@en .
+###  http://iwu.fraunhofer.de/causalgraph#CausalNode
+cg:CausalNode rdf:type owl:Class ;
+              rdfs:comment "A Causal Node refers to an information-carrying Node in the Causal Graph. The information can be of different types (e.g., Event, State, (Continous) Variable) and origins (created by Human or Machine)."@en ;
+              rdfs:label "CausalNode"@en .
 
 
-###  urn:absolute:causalgraph#CausalNode
-:CausalNode rdf:type owl:Class ;
-            rdfs:comment "A Causal Node refers to an information carying Node in the Causal Graph. The information can be of different types (e.g. Event, State, (Continous) Variable) and origins (created by Human or Machine)."@en ;
-            rdfs:label "CausalNode"@en .
+###  http://iwu.fraunhofer.de/causalgraph#Creator
+cg:Creator rdf:type owl:Class ;
+           rdfs:comment "The Creator of the causal individual. The creation can either be a manual process, which instantiates individuals, or software-based learning from data sources."@en ;
+           rdfs:label "Creator"@en .
 
 
-###  urn:absolute:causalgraph#Creator
-:Creator rdf:type owl:Class ;
-         rdfs:label "Creator"@en .
+###  http://iwu.fraunhofer.de/causalgraph#Event
+cg:Event rdf:type owl:Class ;
+         rdfs:subClassOf cg:CausalNode ;
+         rdfs:comment "Defines a CausalNode of with an event-like Signal Type."@en ;
+         rdfs:label "Event"@en .
 
 
-###  urn:absolute:causalgraph#Error_Event
-:Error_Event rdf:type owl:Class ;
-             rdfs:subClassOf :Event ;
-             rdfs:comment "An Event describing an Error."@en ;
-             rdfs:label "Error Event"@en .
+###  http://iwu.fraunhofer.de/causalgraph#HumanInput_Event
+cg:HumanInput_Event rdf:type owl:Class ;
+                    rdfs:subClassOf cg:Event ;
+                    rdfs:comment "An Event indicated by a Human."@en ;
+                    rdfs:label "HumanInput Event"@en .
 
 
-###  urn:absolute:causalgraph#Event
-:Event rdf:type owl:Class ;
-       rdfs:subClassOf :CausalNode ;
-       rdfs:comment "Defines a Causal Node of with an Event-like Signal Type."@en ;
-       rdfs:label "Event"@en .
+###  http://iwu.fraunhofer.de/causalgraph#HumanInput_State
+cg:HumanInput_State rdf:type owl:Class ;
+                    rdfs:subClassOf cg:State ;
+                    rdfs:comment "A state derived by a Human as a 'sensor'."@en ;
+                    rdfs:label "HumanInput State"@en .
 
 
-###  urn:absolute:causalgraph#Expert
-:Expert rdf:type owl:Class ;
-        rdfs:subClassOf :Human .
+###  http://iwu.fraunhofer.de/causalgraph#HumanInput_Variable
+cg:HumanInput_Variable rdf:type owl:Class ;
+                       rdfs:subClassOf cg:Variable ;
+                       rdfs:comment "A variable whose values are manually updated by a Human."@en ;
+                       rdfs:label "HumanInput Variable"@en .
 
 
-###  urn:absolute:causalgraph#Human
-:Human rdf:type owl:Class ;
-       rdfs:subClassOf :Creator ;
-       owl:disjointWith :Machine .
+###  http://iwu.fraunhofer.de/causalgraph#Human_Creator
+cg:Human_Creator rdf:type owl:Class ;
+                 rdfs:subClassOf cg:Creator ;
+                 owl:disjointWith cg:Machine_Creator ;
+                 rdfs:comment "The Creator of the causal individual, being a human, manually added the causal individual."@en ;
+                 rdfs:label "Human Creator"@en .
 
 
-###  urn:absolute:causalgraph#HumanInput_Event
-:HumanInput_Event rdf:type owl:Class ;
-                  rdfs:subClassOf :Event .
+###  http://iwu.fraunhofer.de/causalgraph#Importer_Creator
+cg:Importer_Creator rdf:type owl:Class ;
+                    rdfs:subClassOf cg:Machine_Creator ;
+                    rdfs:comment "The Creator of the causal individual, being an import algorithm, which programmatically creates the causal individual based on a preexisting knowledge base, e.g. a causal graph in a different format."@en ;
+                    rdfs:label "Importer Creator"@en .
 
 
-###  urn:absolute:causalgraph#HumanInput_State
-:HumanInput_State rdf:type owl:Class ;
-                  rdfs:subClassOf :State .
+###  http://iwu.fraunhofer.de/causalgraph#LearningAlgorithm_Creator
+cg:LearningAlgorithm_Creator rdf:type owl:Class ;
+                             rdfs:subClassOf cg:Machine_Creator ;
+                             rdfs:comment "The Creator of the causal individual, being a learning-algorithm, which programmatically creates the causal individual based on data."@en ;
+                             rdfs:label "Learning Algorithm Creator"@en .
 
 
-###  urn:absolute:causalgraph#HumanInput_Variable
-:HumanInput_Variable rdf:type owl:Class ;
-                     rdfs:subClassOf :Variable .
+###  http://iwu.fraunhofer.de/causalgraph#Machine_Creator
+cg:Machine_Creator rdf:type owl:Class ;
+                   rdfs:subClassOf cg:Creator ;
+                   rdfs:comment "The Creator of the causal individual, being a software artifact, which programmatically created the causal individual."@en ;
+                   rdfs:label "Machine Creator"@en .
 
 
-###  urn:absolute:causalgraph#HybridCausalModel
-:HybridCausalModel rdf:type owl:Class ;
-                   rdfs:subClassOf :CausalGraph ;
-                   rdfs:comment "A Causal Graph WITH functions / structural equations attached to SOME (NOT ALL) of its causal edges."@en ;
-                   rdfs:label "HybridCausalModel"@en .
+###  http://iwu.fraunhofer.de/causalgraph#Machine_Event
+cg:Machine_Event rdf:type owl:Class ;
+                 rdfs:subClassOf cg:Event ;
+                 rdfs:comment "An Event generated automatically by a Machine or a software artefact."@en ;
+                 rdfs:label "Machine Event"@en .
 
 
-###  urn:absolute:causalgraph#Importer
-:Importer rdf:type owl:Class ;
-          rdfs:subClassOf :Machine .
+###  http://iwu.fraunhofer.de/causalgraph#Machine_State
+cg:Machine_State rdf:type owl:Class ;
+                 rdfs:subClassOf cg:State ;
+                 rdfs:comment "A state-signal controlled and indicated by a machine or software artefact."@en ;
+                 rdfs:label "Machine State"@en .
 
 
-###  urn:absolute:causalgraph#LearningAlgorithm
-:LearningAlgorithm rdf:type owl:Class ;
-                   rdfs:subClassOf :Machine .
+###  http://iwu.fraunhofer.de/causalgraph#Machine_Variable
+cg:Machine_Variable rdf:type owl:Class ;
+                    rdfs:subClassOf cg:Variable ;
+                    rdfs:comment "A variable whose values are automatically updated by a digital sensor."@en ;
+                    rdfs:label "Machine Variable"@en .
 
 
-###  urn:absolute:causalgraph#Machine
-:Machine rdf:type owl:Class ;
-         rdfs:subClassOf :Creator .
+###  http://iwu.fraunhofer.de/causalgraph#State
+cg:State rdf:type owl:Class ;
+         rdfs:subClassOf cg:CausalNode ;
+         rdfs:comment "Defines a CausalNode with an state-like signal Type. State-like means, that the signal is shifting between discrete states. These can be binary states (for example 1/0; on/off) or signals with more than two states (for example high, mid, low)."@en ;
+         rdfs:label "State"@en .
 
 
-###  urn:absolute:causalgraph#MachineError_Event
-:MachineError_Event rdf:type owl:Class ;
-                    rdfs:subClassOf :Error_Event ,
-                                    :Machine_Event .
-
-
-###  urn:absolute:causalgraph#Machine_Event
-:Machine_Event rdf:type owl:Class ;
-               rdfs:subClassOf :Event .
-
-
-###  urn:absolute:causalgraph#Machine_State
-:Machine_State rdf:type owl:Class ;
-               rdfs:subClassOf :State .
-
-
-###  urn:absolute:causalgraph#Machine_Variable
-:Machine_Variable rdf:type owl:Class ;
-                  rdfs:subClassOf :Variable .
-
-
-###  urn:absolute:causalgraph#ManualError_Event
-:ManualError_Event rdf:type owl:Class ;
-                   rdfs:subClassOf :Error_Event ,
-                                   :HumanInput_Event .
-
-
-###  urn:absolute:causalgraph#State
-:State rdf:type owl:Class ;
-       rdfs:subClassOf :CausalNode ;
-       rdfs:comment "Defines a Causal Node of with an State-like Signal Type."@en ;
-       rdfs:label "State"@en .
-
-
-###  urn:absolute:causalgraph#StructuralCausalModel
-:StructuralCausalModel rdf:type owl:Class ;
-                       rdfs:subClassOf :CausalGraph ;
-                       rdfs:comment "A Causal Graph WITH functions / structural equations attached to ALL its causal edges."@en ;
-                       rdfs:label "StructuralCausalModel"@en .
-
-
-###  urn:absolute:causalgraph#Variable
-:Variable rdf:type owl:Class ;
-          rdfs:subClassOf :CausalNode .
+###  http://iwu.fraunhofer.de/causalgraph#Variable
+cg:Variable rdf:type owl:Class ;
+            rdfs:subClassOf cg:CausalNode ;
+            rdfs:comment "Defines a CausalNode with a signal representing a variable. The variable should be continuous in values. Therefore a variable is neither an Event nor a State."@en ;
+            rdfs:label "Variable"@en .
 
 
 #################################################################
@@ -228,17 +268,9 @@
 #################################################################
 
 [ rdf:type owl:AllDisjointClasses ;
-  owl:members ( :CausalGraphicalModel
-                :HybridCausalModel
-                :StructuralCausalModel
-              )
-] .
-
-
-[ rdf:type owl:AllDisjointClasses ;
-  owl:members ( :Event
-                :State
-                :Variable
+  owl:members ( cg:Event
+                cg:State
+                cg:Variable
               )
 ] .
 

@@ -7,20 +7,19 @@
 # general imports
 import owlready2
 from logging import Logger
-# causalgraph imports
-from causalgraph.utils.logging_utils import init_logger
-from causalgraph.utils.owlready2_utils import get_entity_by_name
-from causalgraph.utils.owlready2_utils import create_individual_of_type
-from causalgraph.utils.owlready2_utils import validate_prop_for_type
-from causalgraph.utils.owlready2_utils import validate_data_type_for_property
 import networkx as nx
 import numpy as np
+
+from typing import Union
+# causalgraph imports
+from causalgraph.utils.logging_utils import init_logger
 import causalgraph.utils.owlready2_utils as owlutils
 
 
 class Mapping():
     def __init__(self, graph, logger: Logger = None) -> None:
         self.graph = graph
+        self.validate_domain_range = graph.validate_domain_range
         if logger is not None:
             self.logger = logger
         else:
@@ -61,31 +60,31 @@ class Mapping():
         # Handling all CausalNodes
         for causalnode in causalnodes_list:
             # Append the dict for single individuals to the dict of the whole graph
-            causalnode_prop_dict = self.__add_properties_to_dict(individual=causalnode[0], indi_type='CausalNode')
+            causalnode_prop_dict = self.__create_prop_dict_from_individual(individual=causalnode[0])
             if len(causalnode_prop_dict) > 0:
                 dict_graph[causalnode[0].name] = causalnode_prop_dict
         # Handling all CausalEdge
         for causaledge in causaledges_list:
             # Append the dict for single individuals to the dict of the whole graph
-            causaledge_prop_dict = self.__add_properties_to_dict(individual=causaledge[0], indi_type='CausalEdge')
+            causaledge_prop_dict = self.__create_prop_dict_from_individual(individual=causaledge[0])
             if len(causaledge_prop_dict) > 0:
                 dict_graph[causaledge[0].name] = causaledge_prop_dict
         return dict_graph
 
 
-    def __add_properties_to_dict(self, individual: object, indi_type: str) -> dict:
-        """Creates a properties dict of a single individual and returns it. Type of individual must be
-        passed due to possible multi class inheritance.
+    def __create_prop_dict_from_individual(self, individual: owlready2.Thing) -> dict:
+        """Creates a properties dict of a single individual and returns it. 
+        Multiple types of an individual are supported and will be added to the dict (e.G. [CausalNode, Error])
 
         :param individual: Individual object
-        :type individual: object
+        :type individual: owlready2.Thing
         :param type: Object type (e. g. CausalNode, CausalEdge)
         :type type: str
         :raises ValueError: Unvalid property Error
         :return: Properties dict of single individual
         :rtype: dict
         """
-        prop_dict = {'type': indi_type, 'iri': individual.iri}
+        prop_dict = {'type': [type_.name for type_ in individual.is_a], 'iri': individual.iri}
         # Iteratively fill the property dictionary
         possible_props = self.causalgraph_object_properties + self.causalgraph_data_properties + self.third_party_data_properties + self.third_party_object_properties
         for prop in individual.get_properties():
@@ -165,7 +164,7 @@ class Mapping():
             return False
         # Add nodes without their properties to graph_dict
         for nodes in node_names:
-            graph_dict[nodes] = {"type": "CausalNode"}
+            graph_dict[nodes] = {"type": ['CausalNode']}
         # Handle all edges, also add missing node properties
         for node_ind, matrix in enumerate(link_matrix):
             # Get indices of cause/effect pair and timelag
@@ -190,13 +189,13 @@ class Mapping():
                     return False
                 # Add edge with its cause, effect, confidence and timelag to graph_dict
                 graph_dict[edge_name] = {}
-                graph_dict[edge_name].update({"hasCause": [cause]})
+                graph_dict[edge_name].update({"hasCause": cause})
                 if confidence != 0.0:
                     graph_dict[edge_name].update({"hasConfidence": float(confidence)})
-                graph_dict[edge_name].update({"hasEffect": [effect]})
+                graph_dict[edge_name].update({"hasEffect": effect})
                 if time_lag != 0.0:
                     graph_dict[edge_name].update({"hasTimeLag": float(time_lag)})
-                graph_dict[edge_name].update({"type": "CausalEdge"})
+                graph_dict[edge_name].update({"type": ['CausalEdge']})
                 # Add node properties "affected_by" and "causing"
                 graph_dict[cause].setdefault("isCausing", []).append(edge_name)
                 graph_dict[effect].setdefault("isAffectedBy", []).append(edge_name)
@@ -212,7 +211,7 @@ class Mapping():
         :rtype: causalgraph.Graph()
         """
         if type(graph_dict) not in [dict] or graph_dict == {}:
-            self.logger.error("Filling graph with individuals from graph_dict wasn't successful. Passed graph_dict not valid.")
+            self.logger.error(f"Filling graph with individuals from graph_dict wasn't successful. Passed graph_dict not valid. Got graph dict: {graph_dict}")
             return self.graph
         # Check if Graph is empty
         causalnodes_list = owlutils.get_all_causalnodes(self.graph.store)
@@ -221,80 +220,105 @@ class Mapping():
             self.logger.error("Filling graph with individuals from graph_dict wasn't successful. Graph is not empty.")
             return self.graph
 
-        # Iterate over all individuals in graph_dict
-        # Handling CausalNode first
-        for individual in graph_dict:
-            individual_type = graph_dict[individual]['type']
-            # Handling CausalNodes
-            if individual_type == 'CausalNode':
-                # Create props for later usage as kwargs in G.add.causal_node()
-                individual_prop_dict = self.__create_individual_kwargs_props(graph_dict=graph_dict, individual=individual, type_class=individual_type)
-                # Create CausalNode with props kwargs
-                self.graph.add.causal_node(individual, **individual_prop_dict)      
-
-        # Iterate over individuals over graph_dict
-        # Handling CausalEdges after CausalNodes
-        for individual in graph_dict:
-            individual_type = graph_dict[individual]['type']
-            # Handling CausalEdges
-            if individual_type == 'CausalEdge':
-                # Create props for later usage as kwargs in G.add.causal_edge()
-                individual_prop_dict = self.__create_individual_kwargs_props(graph_dict=graph_dict, individual=individual, type_class=individual_type)
-                # Create CausalEdge with props kwargs
-                cause = graph_dict[individual]['hasCause'][0]
-                effect = graph_dict[individual]['hasEffect'][0]
-                edge_name = individual
-                self.graph.add.causal_edge(cause_node_name=cause, effect_node_name=effect, name_for_edge=edge_name, **individual_prop_dict)
-
+        ### Iterate over all individuals in graph_dict
+        # 1) Check which types can be retrieved and sort into Causal Nodes and Causal Edges
+        causal_node_dict = {}
+        causal_edge_dict = {}
+        for individual, props in graph_dict.items():
+            type_dict = {type_str: self.graph.get_entity(type_str, suppress_warn=True) for type_str in props['type']}
+            # First remove all types, which can not be found in causal knowledge graph
+            for type_str, type_obj in type_dict.items():
+                if type_obj == None:
+                    self.logger.warning(f"TypeDefinition '{type_str}' of individual '{individual}' could not be found in causalgraph-store. Please import the right ontologies first. Type of individual removed from graph_dict.")
+                    props['type'].remove(type_str)
+            # Sort into causal_node_dict, causal_edge_dict or display error
+            if any(owlutils.is_subclass_of(type_, "CausalNode", self.graph.store) for type_ in props['type']):
+                causal_node_dict[individual] = props
+            elif any(owlutils.is_subclass_of(type_, "CausalEdge", self.graph.store) for type_ in props['type']):
+                causal_edge_dict[individual] = props
+            else:
+                raise ValueError(f"Individual '{individual}' in dict is neither 'CausalNode' nor 'CausalEdge'. Only Causal entities supported")
+        # 2) Create causalNodes first
+        for individual_name, props_dict in causal_node_dict.items():
+            individual_prop_dict = self.__create_individual_kwargs_props(props_dict)
+            # Create CausalNode with props kwargs
+            # 2A) Validate domain and range of properties first (if validate_domain_range is True), as adding causal_node will fail otherwise
+            pre_validation = owlutils.validate_property_target_pairs_for_classes(props_dict["type"], individual_prop_dict,
+                                                                                 self.graph.store, logger=self.logger,
+                                                                                 validate_domain_range=self.validate_domain_range)
+            if pre_validation is False:
+                raise ValueError(f"Individual '{individual_name}' with props {individual_prop_dict} could not be created. Property validation failed.")
+            # 2B) Create CausaLNode, with disabled internal validation, only if pre_validation succeeded 
+            # >> This is needed to allow creation first as "CausalNode" and then in 2C change to other derived types
+            causal_node = self.graph.add.causal_node(individual_name, validate_domain_range = False, **individual_prop_dict)
+            if causal_node == None:
+                raise RuntimeError(f"Causal Node '{individual_name}' with props {individual_prop_dict} could not be created. Please check graph_dict: {graph_dict}.")
+            # 2C) Add other potential types as well (e.g. [Pizza, CausalGraph])
+            individual_types_str = props_dict['type']
+            types_list = [self.graph.get_entity(type_str, suppress_warn=True) for type_str in individual_types_str]
+            causal_node.is_a = types_list
+        # 3) Create causalEdges after causalNodes
+        for individual_name, props_dict in causal_edge_dict.items():
+            # Create props for later usage as kwargs in G.add.causal_edge()
+            individual_prop_dict = self.__create_individual_kwargs_props(props_dict)
+            # Create CausalEdge with props kwargs
+            cause = props_dict['hasCause']
+            effect = props_dict['hasEffect']
+            causal_edge = self.graph.add.causal_edge(cause_node=cause, effect_node=effect, name_for_edge=individual_name, **individual_prop_dict)
+            if causal_edge == None:
+                raise RuntimeError(f"Causal Edge '{individual_name}' with props {individual_prop_dict} could not be created. Please check graph_dict: {graph_dict}.")
+            # Add other potential alias or additonals types as well 
+            individual_types_str = props_dict['type']
+            types_list = [self.graph.get_entity(type_str, suppress_warn=True) for type_str in individual_types_str]
+            causal_edge.is_a = types_list
         # Return filled Graph() object
         return self.graph
 
 
-    def __create_individual_kwargs_props(self, graph_dict: dict, individual: str, type_class: str) -> dict:
+    def __create_individual_kwargs_props(self, props_dict: dict) -> dict:
         """This method returns a props dict that can be used to passed as kwargs to the functions add.causal_node()
         or add.causal_edge(). The prop dict will not be containing the properties ["isCausing", "isAffectedBy", "hasCause", "hasEffect"].
-
-        :param graph_dict: A causalgraph properties dict of a whole graph
-        :type graph_dict: dict
-        :param individual: Name of the individual
-        :type individual: str
-        :param type_class: Type of the individual (e. g. CausalEdge or CausalNode)
-        :type type_class: str
+        
+        :param props_dict: The properties dict of the individual
+        :type props_dict: dict
         :return: A properties dict that can be passed as kwargs to add.causal_node() or add.causal_edge()
         :rtype: dict
         """
-        individual_prop_dict = {}
-
-        limiter = []
-        if type_class == "CausalNode":
+        # Remove properties that are not needed for creation
+        types = props_dict['type']
+        if any(owlutils.is_subclass_of(type_, "CausalNode", self.graph.store) for type_ in types):
             limiter = ['isCausing', 'isAffectedBy']
-        elif type_class == "CausalEdge":
+        elif any(owlutils.is_subclass_of(type_, "CausalEdge", self.graph.store) for type_ in types):
             limiter = ['hasCause', 'hasEffect']
         else:
-            self.logger.error(f"Type class '{type_class}' not supported. Empty dict will be returned.")
+            self.logger.error(f"Type classes '{types}' not supported. Empty dict will be returned.")
             return {}
 
-        for prop in graph_dict[individual]:
+        # Create individual_prop_dict
+        individual_prop_dict = {}
+        for prop in props_dict:
             if prop not in ['iri', 'type']:
                 # if prop is object property
                 if prop in (self.causalgraph_object_properties + self.third_party_object_properties) and prop not in limiter:
-                    prop_value = graph_dict[individual][prop]
+                    prop_value = props_dict[prop]
                     if prop == 'comment':
                         comments = list(prop_value)
                         individual_prop_dict[prop] = comments
                     else:
                         if type(prop_value) is list:
                             for value in prop_value:
-                                exists = owlutils.entity_exists(entity_name=value, store=self.graph.store)
+                                exists = owlutils.entity_exists(entity=value, store=self.graph.store)
                                 if not exists:
-                                    range = owlutils.get_range_of_property(store=self.graph.store, property_name=prop)
-                                    new_indi_name = owlutils.create_individual_of_type(
+                                    prop_obj = owlutils.get_entity_by_name(prop, self.graph.store, logger=self.logger)
+                                    range = prop_obj.range
+                                    new_indi = owlutils.create_individual_of_type(
                                         class_of_individual=range[0].name,
                                         store=self.graph.store,
                                         name_for_individual=value,
+                                        validate_domain_range=self.validate_domain_range,
                                         logger=self.logger
                                     )
-                                    new_indi = owlutils.get_entity_by_name(name_of_entity=new_indi_name, store=self.graph.store, logger=self.logger)
+                                    new_indi_name = new_indi.name
                                     try:
                                         individual_prop_dict[prop].append(new_indi)
                                     except:
@@ -306,23 +330,25 @@ class Mapping():
                                     except:
                                         individual_prop_dict[prop] = [old_indi]
                         else:
-                            exists = owlutils.entity_exists(entity_name=prop_value, store=self.graph.store)
+                            exists = owlutils.entity_exists(entity=prop_value, store=self.graph.store)
                             if not exists:
-                                range = owlutils.get_range_of_property(store=self.graph.store, property_name=prop)
-                                new_indi_name = owlutils.create_individual_of_type(
+                                prop_obj = owlutils.get_entity_by_name(prop, self.graph.store, logger=self.logger)
+                                range = prop_obj.range
+                                new_indi = owlutils.create_individual_of_type(
                                     class_of_individual=range[0].name,
                                     store=self.graph.store,
                                     name_for_individual=prop_value,
+                                    validate_domain_range=self.validate_domain_range,
                                     logger=self.logger
                                 )
-                                new_indi = owlutils.get_entity_by_name(name_of_entity=new_indi_name, store=self.graph.store, logger=self.logger)
+                                new_indi_name = new_indi.name
                                 individual_prop_dict[prop] = new_indi
                             else:
                                 old_indi = owlutils.get_entity_by_name(name_of_entity=prop_value, store=self.graph.store, logger=self.logger)
                                 individual_prop_dict[prop] = old_indi
                 # if prop is data property
                 elif prop in (self.causalgraph_data_properties + self.third_party_data_properties):
-                    prop_value = graph_dict[individual][prop]  
+                    prop_value = props_dict[prop]  
                     individual_prop_dict[prop] = prop_value
                 # property unknown
                 else:
@@ -334,17 +360,3 @@ class Mapping():
 
     def update_graph_from_dict(self, graph_dict: dict=None):
         raise NotImplementedError
-
-
-    def __validate_property(self, property: str) -> bool:
-        """Checks if property is valid and therefore within the causalgraph_object_properties, causalgraph_data_properties or third_party_properties list.
-        Returns True if valid, otherwise False.
-
-        :param property: Name of property
-        :type property: str
-        :return: True if valid, otherwise False.
-        :rtype: bool
-        """
-        possible_props = self.causalgraph_object_properties + self.causalgraph_data_properties + self.third_party_data_properties + self.third_party_object_properties
-        return property in possible_props
-

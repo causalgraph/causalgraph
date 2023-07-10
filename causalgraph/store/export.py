@@ -13,6 +13,7 @@ from networkx import MultiDiGraph, write_graphml, write_gml
 # causalgraph and owlready imports
 import owlready2
 from causalgraph.utils.logging_utils import init_logger
+from causalgraph.utils.owlready2_utils import is_subclass_of
 
 
 class Export():
@@ -41,17 +42,19 @@ class Export():
         G_nx = MultiDiGraph()
         graph_dict = self.graph.map.all_individuals_to_dict()
         for individual in graph_dict:
-            individual_type = graph_dict[individual]["type"]
+            individual_types = graph_dict[individual]["type"]
             individual_name = individual
             properties_dict = graph_dict[individual]
-            if individual_type == "CausalNode":
+            #if "CausalNode" in individual_types:
+            if any(is_subclass_of(type_, "CausalNode", self.graph.store) for type_ in individual_types):
                 G_nx.add_node(individual_name, **properties_dict)
-            elif individual_type == "CausalEdge":
-                cause = graph_dict[individual]["hasCause"][0]
-                effect = graph_dict[individual]["hasEffect"][0]
+            #elif "CausalEdge" in individual_types:
+            elif any(is_subclass_of(type_, "CausalEdge", self.graph.store) for type_ in individual_types):
+                cause = graph_dict[individual]["hasCause"]
+                effect = graph_dict[individual]["hasEffect"]
                 G_nx.add_edge(cause, effect, **properties_dict)
             else:
-                self.logger.error(f"Individual type '{individual_type}' unknown.")
+                self.logger.error(f"Individual type '{individual_types}' unknown.")
                 return False
         return G_nx
 
@@ -132,8 +135,8 @@ class Export():
         edge_names = {}
         # Get list of cg timelags:
         for individual in graph_dict:
-            individual_type = graph_dict[individual]["type"]
-            if individual_type == "CausalEdge":
+            individual_types = graph_dict[individual]["type"]
+            if any(is_subclass_of(type_, "CausalEdge", self.graph.store) for type_ in individual_types):
                 # Get timelag or None
                 time_lag_s = graph_dict[individual].get("time_lag_s", None)
                 if time_lag_s is not None:
@@ -145,15 +148,15 @@ class Export():
             timestep_len_s = 1
 
         for individual in graph_dict:
-            individual_type = graph_dict[individual]["type"]
+            individual_types = graph_dict[individual]["type"]
             individual_name = individual
             # Fill list of node names
-            if individual_type == "CausalNode":
+            if any(is_subclass_of(type_, "CausalNode", self.graph.store) for type_ in individual_types):
                 node_names.append(individual_name)
             # Fill list of edges, incl. their tigramite timelag
-            if individual_type == "CausalEdge":
-                cause = graph_dict[individual].get("hasCause", [None])[0]
-                effect = graph_dict[individual].get("hasEffect", [None])[0]
+            if any(is_subclass_of(type_, "CausalEdge", self.graph.store) for type_ in individual_types):
+                cause = graph_dict[individual].get("hasCause", None)
+                effect = graph_dict[individual].get("hasEffect", None)
                 # If timelag exists for current edge, convert it to tigramite timeframe.
                 # If it doesnt exist, set it to 0. After that add it to list_tigra_timelags
                 time_lag_s = round(graph_dict[individual].get("hasTimeLag", 0)/timestep_len_s)

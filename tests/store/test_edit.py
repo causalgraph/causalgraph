@@ -6,12 +6,10 @@
 """
 
 # general imports
-import os
 from pathlib import Path
 import pytest
 # causalgraph imports
 from causalgraph import Graph
-import causalgraph.utils.mapping as maputils
 import causalgraph.utils.owlready2_utils as owlutils
 from causalgraph.utils.owlready2_utils import get_entity_by_name
 
@@ -19,47 +17,38 @@ from causalgraph.utils.owlready2_utils import get_entity_by_name
 ########################################
 ###            Fixtures              ###
 ########################################
-# Temporary sql_db for every test
-@pytest.fixture(name= "sql_test_db_path")
-def fixture_sql_test_db_path(tmpdir) -> str:
-    test_db_relative_path = os.path.join(tmpdir, "test_edit.sqlite3")
-    yield test_db_relative_path
-    os.remove(test_db_relative_path)
 
-
-@pytest.fixture(name= "testdata_dir")
+@pytest.fixture(name="testdata_dir")
 def fixture_testdata_dir() -> Path:
     testdata_dir = Path(__file__).absolute().parent.parent / 'testdata'
     return testdata_dir
 
 
-@pytest.fixture(name= "graph")
-def fixture_test_graph(sql_test_db_path) -> Graph:
+@pytest.fixture(name="graph")
+def fixture_test_graph() -> Graph:
     # Init graph
-    graph = Graph(sql_db_filename=sql_test_db_path)
+    graph = Graph(sql_db_filename=None)
     # Init creators
-    creator_node_name1 = graph.add.individual_of_type("Creator", name_for_individual="Creator1")
-    creator_node_name2 = graph.add.individual_of_type("Creator", name_for_individual="Creator2")
-    creator_node1 = owlutils.get_entity_by_name(creator_node_name1, graph.store)
-    creator_node2 = owlutils.get_entity_by_name(creator_node_name2, graph.store)
+    creator_node1 = graph.add.individual_of_type("Creator", name_for_individual="Creator1")
+    creator_node2 = graph.add.individual_of_type("Creator", name_for_individual="Creator2")
     # Init nodes
     graph.add.causal_node('Node 1')
     graph.add.causal_node('Node 2')
     graph.add.causal_node('Node 3')
     graph.add.causal_node('Node 4')
     # Init edges
-    graph.add.causal_edge(cause_node_name= 'Node 1',
-                          effect_node_name= 'Node 3',
+    graph.add.causal_edge(cause_node= 'Node 1',
+                          effect_node= 'Node 3',
                           name_for_edge= 'Edge 1',
                           confidence= 0.6,
                           time_lag_s= 3)
-    graph.add.causal_edge(cause_node_name= 'Node 2',
-                          effect_node_name= 'Node 3',
+    graph.add.causal_edge(cause_node= 'Node 2',
+                          effect_node= 'Node 3',
                           name_for_edge= 'Edge 2',
                           time_lag_s= 3,
                           hasCreator= [creator_node1])
-    graph.add.causal_edge(cause_node_name= 'Node 3',
-                          effect_node_name= 'Node 4',
+    graph.add.causal_edge(cause_node= 'Node 3',
+                          effect_node= 'Node 4',
                           name_for_edge= 'Edge 3',
                           confidence= 0.6,
                           time_lag_s= 3,
@@ -91,8 +80,8 @@ def test_renaming_individuals(graph: Graph):
     graph.add.causal_node("effect_1")
     graph.add.individual_of_type("Creator", "creator_1")
     creator_1 = graph.get_entity(name_of_entity= "creator_1")
-    graph.add.causal_edge(cause_node_name= "cause_1",
-                               effect_node_name= "effect_1",
+    graph.add.causal_edge(cause_node= "cause_1",
+                               effect_node= "effect_1",
                                name_for_edge= "edge_1",
                                confidence= 0.5,
                                time_lag_s= 5,
@@ -121,8 +110,8 @@ def test_renaming_individuals(graph: Graph):
     creator_1_new = graph.get_entity(name_of_entity="creator_1_new", suppress_warn=True)
     assert str(cause_1_new.isCausing) == "[cg_store.edge_1_new]"
     assert str(effect_1_new.isAffectedBy) == "[cg_store.edge_1_new]"
-    assert str(edge_1_new.hasCause) == "[cg_store.cause_1_new]"
-    assert str(edge_1_new.hasEffect) == "[cg_store.effect_1_new]"
+    assert str(edge_1_new.hasCause) == "cg_store.cause_1_new"
+    assert str(edge_1_new.hasEffect) == "cg_store.effect_1_new"
     assert str(edge_1_new.hasCreator) == "[cg_store.creator_1_new]"
     assert edge_1_new.hasConfidence == 0.5
     assert edge_1_new.hasTimeLag == 5
@@ -134,8 +123,8 @@ def test_renaming_individuals_foreign_onto(pizza_graph: Graph):
     # Init basic graph with foreign ontology and properties
     pizza_graph.add.individual_of_type("Creator", "creator_1")
     creator_1 = pizza_graph.get_entity(name_of_entity="creator_1")
-    pizza_graph.add.causal_edge(cause_node_name= "cause_1",
-                                effect_node_name= "effect_1",
+    pizza_graph.add.causal_edge(cause_node= "cause_1",
+                                effect_node= "effect_1",
                                 name_for_edge= "edge_1",
                                 confidence=0.5,
                                 time_lag_s=5,
@@ -164,10 +153,10 @@ def test_renaming_individuals_foreign_onto(pizza_graph: Graph):
     creator_1_new = pizza_graph.get_entity(name_of_entity="creator_1_new", suppress_warn=True)
     assert edge_1_new.hasTimeLag == 5
     assert edge_1_new.hasConfidence == 0.5
-    assert str(edge_1_new.hasCause) == "[cg_store.cause_1_new]"
+    assert str(edge_1_new.hasCause) == "cg_store.cause_1_new"
     assert str(creator_1_new.created) == "[cg_store.edge_1_new]"
     assert str(cause_1_new.isCausing) == "[cg_store.edge_1_new]"
-    assert str(edge_1_new.hasEffect) == "[cg_store.effect_1_new]"
+    assert str(edge_1_new.hasEffect) == "cg_store.effect_1_new"
     assert str(edge_1_new.hasCreator) == "[cg_store.creator_1_new]"
     assert str(effect_1_new.isAffectedBy) == "[cg_store.edge_1_new]"
 
@@ -179,8 +168,8 @@ def test_renaming_individual_already_exist(graph: Graph, pizza_graph: Graph):
     graph.add.causal_node("effect_1")
     graph.add.individual_of_type("Creator", "creator_1")
     creator_1 = graph.get_entity(name_of_entity="creator_1")
-    graph.add.causal_edge(cause_node_name= "cause_1",
-                          effect_node_name= "effect_1",
+    graph.add.causal_edge(cause_node= "cause_1",
+                          effect_node= "effect_1",
                           name_for_edge= "edge_1",
                           confidence=0.5,
                           time_lag_s=5,
@@ -207,8 +196,8 @@ def test_renaming_individual_not_exist(graph: Graph, pizza_graph: Graph):
     # Init basic graph with properties
     graph.add.individual_of_type("Creator", "creator_1")
     creator_1 = graph.get_entity(name_of_entity="creator_1")
-    graph.add.causal_edge(cause_node_name= "cause_1",
-                          effect_node_name= "effect_1",
+    graph.add.causal_edge(cause_node= "cause_1",
+                          effect_node= "effect_1",
                           name_for_edge= "edge_1",
                           confidence=0.5,
                           time_lag_s=5,
@@ -229,19 +218,19 @@ def test_change_type_to_subtype_known_onto(faults_graph: Graph):
     graph.add.individual_of_type("Creator", "creator_1")
     results = []
     # Change type of individual to its first layer subtypes
-    res_node_1 = graph.edit.type_to_subtype(name_of_entity="node_1", new_type="State")
-    res_creator_1 = graph.edit.type_to_subtype(name_of_entity="creator_1", new_type="Human_Creator")
+    res_node_1 = graph.edit.type_to_subtype(entity="node_1", new_type="State")
+    res_creator_1 = graph.edit.type_to_subtype(entity="creator_1", new_type="Human_Creator")
     results.extend([res_node_1, res_creator_1])
     # Change type of individual to its second layer subtypes
     graph.add.causal_node("node_2")
     graph.add.individual_of_type("Creator", "creator_2")
-    result_node_2 = graph.edit.type_to_subtype(name_of_entity="node_2", new_type="HumanInput_Event")
-    result_creator_2 = graph.edit.type_to_subtype(name_of_entity="creator_2",
+    result_node_2 = graph.edit.type_to_subtype(entity="node_2", new_type="HumanInput_Event")
+    result_creator_2 = graph.edit.type_to_subtype(entity="creator_2",
                                                   new_type="LearningAlgorithm_Creator")
     results.extend([result_node_2, result_creator_2])
     # Change type of individual to its third layer subtypes
     graph.add.causal_node("node_3")
-    res_node_3 = graph.edit.type_to_subtype(name_of_entity="node_3", new_type="MachineFault_Event")
+    res_node_3 = graph.edit.type_to_subtype(entity="node_3", new_type="MachineFault_State")
     results.append(res_node_3)
     # Check results
     for result in results:
@@ -256,8 +245,8 @@ def test_change_type_to_subtype_mult_inheritance(pizza_graph: Graph):
     # Edge makes the pizzas from type CausalNode as well
     pizza_graph.add.causal_edge("my_marga", "my_mush", "pizza_edge")
     # Change type of pizzas from CausalNode to something else
-    assert pizza_graph.edit.type_to_subtype(name_of_entity="my_marga", new_type="State") is True
-    assert pizza_graph.edit.type_to_subtype(name_of_entity="my_mush", new_type="Event") is True
+    assert pizza_graph.edit.type_to_subtype(entity="my_marga", new_type="State") is True
+    assert pizza_graph.edit.type_to_subtype(entity="my_mush", new_type="Event") is True
     # Check if pizzas are still from type Pizza but now also "State" or "Event"
     my_marga = pizza_graph.get_entity("my_marga", True)
     assert str(my_marga.is_a) == "[pizza.Margherita, causalgraph.State]"
@@ -272,8 +261,8 @@ def test_change_type_to_subtype_type_not_allowed(graph: Graph):
     # Try to change its type to something that is not allowed
     type_to_subtype_successful = graph.edit.type_to_subtype("node_1", "Creator")
     assert type_to_subtype_successful is False
-    assert owlutils.is_instance_of_class("node_1", 'CausalNode', graph.store) is True
-    assert owlutils.is_instance_of_class("node_1", 'Creator', graph.store) is False
+    assert owlutils.is_instance_of_type("node_1", 'CausalNode', graph.store) is True
+    assert owlutils.is_instance_of_type("node_1", 'Creator', graph.store) is False
 
 
 def test_change_type_to_subtype_type_non_existing(graph: Graph):
@@ -282,7 +271,7 @@ def test_change_type_to_subtype_type_non_existing(graph: Graph):
     # Try to change its type to something that is not existing
     type_to_subtype_successful = graph.edit.type_to_subtype("node_1", "Some_Type")
     assert type_to_subtype_successful is False
-    assert owlutils.is_instance_of_class("node_1", 'CausalNode', graph.store) is True
+    assert owlutils.is_instance_of_type("node_1", 'CausalNode', graph.store) is True
 
 
 ### Tests for Properties changes
@@ -291,8 +280,8 @@ def test_properties_change_multiple_properties(graph: Graph):
     # Assert properties of edge 1
     edge_1 = get_entity_by_name('Edge 1', graph.store)
     assert edge_1.name == 'Edge 1'
-    assert edge_1.hasCause[0] == get_entity_by_name('Node 1', graph.store)
-    assert edge_1.hasEffect[0] == get_entity_by_name('Node 3', graph.store)
+    assert edge_1.hasCause == get_entity_by_name('Node 1', graph.store)
+    assert edge_1.hasEffect == get_entity_by_name('Node 3', graph.store)
     assert edge_1.hasConfidence == 0.6
     assert edge_1.hasTimeLag == 3
     assert edge_1.comment == []
@@ -303,8 +292,8 @@ def test_properties_change_multiple_properties(graph: Graph):
     edge_1 = get_entity_by_name('Edge 1', graph.store)
     assert succ is True
     assert edge_1.name == 'Edge 1'
-    assert edge_1.hasCause[0] == get_entity_by_name('Node 1', graph.store)
-    assert edge_1.hasEffect[0] == get_entity_by_name('Node 3', graph.store)
+    assert edge_1.hasCause == get_entity_by_name('Node 1', graph.store)
+    assert edge_1.hasEffect == get_entity_by_name('Node 3', graph.store)
     assert edge_1.hasConfidence == 0.3
     assert edge_1.hasTimeLag == 2
     assert edge_1.comment[0] == 'This is edge 1!'
@@ -344,9 +333,16 @@ def test_properties_delete_properties(graph: Graph):
     assert edge_3.comment == []
 
 
-def test_properties_wrong_data_type():
-    # TODO Implement owlutils.validate_data_type_for_property and test
-    pass
+def test_properties_wrong_data_type(graph: Graph):
+    # Assert properties of edge 3
+    edge_3 = get_entity_by_name('Edge 3', graph.store)
+    assert edge_3.hasConfidence == 0.6
+    assert edge_3.hasTimeLag == 3
+    assert edge_3.comment == []
+    # Delete properties
+    prop_dict = {'hasConfidence': "string"}
+    succ = graph.edit.properties('Edge 3', prop_dict)
+    assert succ is False
 
 
 def test_properties_property_not_allowed(graph:Graph):
@@ -419,10 +415,10 @@ def test_description_change_description(graph: Graph):
     # Create description for node 3
     node_3 = get_entity_by_name('Node 3', graph.store)
     assert node_3.comment == []
-    succ = graph.edit.description('Node 3', 'This is node 3!')
+    succ = graph.edit.description('Node 3', ['This is node 3!'])
     assert node_3.comment[0] == 'This is node 3!'
     # Change description and assert that change successful
-    graph.edit.description('Node 3', 'New description!')
+    graph.edit.description('Node 3', ['New description!'])
     node_3 = get_entity_by_name('Node 3', graph.store)
     assert succ is True
     assert node_3.comment[0] == 'New description!'

@@ -9,15 +9,18 @@ Store is equivalent to owlready2 World """
 import itertools
 from logging import Logger
 import owlready2
+from typing import Union
 # causalgraph imports
 import causalgraph.utils.owlready2_utils as owlutils
+from causalgraph.utils.misc_utils import strict_types
 from causalgraph.utils.logging_utils import init_logger
 
 
 class Add():
     """ Contains all methods to add resources to the store """
-    def __init__(self, store: owlready2.World, logger: Logger = None) -> None:
+    def __init__(self, store: owlready2.World, logger: Logger = None, validate_domain_range: bool = True) -> None:
         self.store = store
+        self.validate_domain_range = validate_domain_range
         if logger is not None:
             self.logger = logger
         else:
@@ -42,7 +45,9 @@ class Add():
         return flattened_prohibited_with_subtypes
 
 
-    def individual_of_type(self, class_of_individual: str, name_for_individual: str= None, **kwargs) -> str:
+    @strict_types
+    def individual_of_type(self, class_of_individual: Union[str, owlready2.Thing], name_for_individual: str = None, 
+                           validate_domain_range: bool = None, **kwargs) -> owlready2.EntityClass:
         """Instantiates an individual of the class(type) specified.
 
         Wraps the default owlready2 functions with error handling and logging.
@@ -51,25 +56,31 @@ class Add():
 
         Example:
         edge_name = graph.add.individual_of_type(class_of_individual= "CausalEdge",
-                                                 hasCause= [node1],
-                                                 hasEffect= [node2],
+                                                 hasCause=node1,
+                                                 hasEffect=node2,
                                                  comment= ["an optional comment"])
 
-        :param class_of_individual: class name of individual
+        :param class_of_individual: class of individual as name or object
         :type class_of_individual: str
         :param name_for_individual: name for individual, defaults to <class_name><no>
         :type name_for_individual: str, optional
-        :return: final name of individual or 'None' if creation failed
-        :rtype: str
+        :param validate_domain_range: Switch to only allow creation of new individuals with valid domain and range for all properties, defaults to 'Graph.validate_domain_range'
+        :type validate_domain_range: bool, optional
+        :return: Entity Object (class/property/individual) of the created individual or 'None' if creation failed
+        :rtype: owlready2.EntityClass
         """
-        return owlutils.create_individual_of_type(class_of_individual= class_of_individual,
-                                                  store= self.store,
-                                                  name_for_individual= name_for_individual,
-                                                  logger= self.logger,
+        if validate_domain_range is None:
+            validate_domain_range = self.validate_domain_range
+        return owlutils.create_individual_of_type(class_of_individual=class_of_individual,
+                                                  store=self.store,
+                                                  name_for_individual=name_for_individual,
+                                                  logger=self.logger,
+                                                  validate_domain_range=validate_domain_range,
                                                   **kwargs)
 
 
-    def causal_node(self, individual_name: str = None, **kwargs) -> str:
+    @strict_types
+    def causal_node(self, individual_name: str = None, validate_domain_range: bool = None, **kwargs) -> owlready2.EntityClass:
         """Creates an individual of class "CausalNode" with the name 'individual_name'.
         If no name is given, the name is automatically generated from the Class name and a number.
         Via the optional **kwargs, arbitrary properties can be set, similar to description here:
@@ -80,39 +91,47 @@ class Add():
 
         :param instance_name: desired name for individual, defaults to causalnode<no>
         :type instance_name: str, optional
-        :return: name of created individual or None if no node is created
-        :rtype: str
+        :param validate_domain_range: Switch to only allow creation of new individuals with valid domain and range for all properties, defaults to 'Graph.validate_domain_range'
+        :type validate_domain_range: bool, optional
+        :return: Entity Object of the created CausalNode or 'None' if no new CausalNode was created
+        :rtype: owlready2.EntityClass
         """
-        causal_node_name = owlutils.create_individual_of_type(class_of_individual= 'CausalNode',
+        if validate_domain_range is None:
+            validate_domain_range = self.validate_domain_range
+        causal_node_object = owlutils.create_individual_of_type(class_of_individual= 'CausalNode',
                                                               store= self.store,
                                                               name_for_individual= individual_name,
                                                               logger= self.logger,
+                                                              validate_domain_range=validate_domain_range,
                                                               **kwargs)
         self.store.save()
-        return causal_node_name
+        return causal_node_object
 
 
-    def causal_edge(self, cause_node_name: str, effect_node_name: str, name_for_edge: str = None,
-                    confidence: float = None, time_lag_s: float = None, force_create: bool = False, **kwargs) -> str:
-        """Adds a 'CausalEdge' between Nodes with names 'cause_node_name' and 'effect_node_name'.
+    @strict_types
+    def causal_edge(self, cause_node: Union[str, owlready2.Thing], effect_node: Union[str, owlready2.Thing], name_for_edge: str = None,
+                    confidence: float = None, time_lag_s: float = None, force_create: bool = False, validate_domain_range: bool = None,
+                    **kwargs) -> owlready2.EntityClass:
+       
+        """Adds a 'CausalEdge' between Nodes with names 'cause_node' and 'effect_node'.
 
         Via the optional **kwargs, arbitrary properties can be set, similar to description here:
         https://owlready2.readthedocs.io/en/v0.35/class.html#creating-individuals
 
         Example (equivalent):
-        - edge_name= graph.add.causal_edge(cause_node_name= cause_node,
-                                            effect_node_name = effect_node,
+        - edge_name= graph.add.causal_edge(cause_node= cause_node,
+                                            effect_node = effect_node,
                                             confidence= 0.2,
                                             comment= ["an optional comment"])
-        - edge_name2= graph.add.causal_edge(cause_node_name= cause_node,
-                                            effect_node_name= effect_node,
+        - edge_name2= graph.add.causal_edge(cause_node= cause_node,
+                                            effect_node= effect_node,
                                             hasConfidence= 0.2,
                                             comment= ["an optional comment"])
 
-        :param cause_node_name: name of the cause node, where the edge originates
-        :type cause_node_name: str
-        :param effect_node_name: name of the effect node, where the edge ends
-        :type effect_node_name: str
+        :param cause_node: A existing CausalNode object or the name of it. Describes the cause node.
+        :type cause_node: Union[str, owlready2.Thing]
+        :param effect_node: A existing CausalNode object or the name of it. Describes the effect node.
+        :type effect_node: Union[str, owlready2.Thing]
         :param name_for_edge: optional name for the edge, defaults to None
         :type name_for_edge: str, optional
         :param confidence: confidence in the edge's existence, defaults to None
@@ -122,12 +141,29 @@ class Add():
         :param force_create: Enable force creation of missing cause/effect node with type
         'CausalNode', defaults to False
         :type force_create: bool, optional
-        :return: edge_name of created edge if successful, None otherwise
-        :rtype: str
+        :param validate_domain_range: Switch to only allow creation of new individuals with valid domain and range for all properties, defaults to 'Graph.validate_domain_range'
+        :type validate_domain_range: bool, optional
+        :return: Entity Object of the created CausalEdge or 'None' if no new CausalEdge was created
+        :rtype: owlready2.EntityClass
         """
+        if validate_domain_range is None:
+            validate_domain_range = self.validate_domain_range
+
+        # Get names and objects of cause and effect node
+        cause_node_name, cause_node_obj = owlutils.get_name_and_object(cause_node, self.store, True)
+        effect_node_name, effect_node_obj = owlutils.get_name_and_object(effect_node, self.store, True)
+
+        # If a Thing was passed, then check if it (still) exists
+        if (cause_node_name is None and cause_node_obj is None):
+            self.logger.error(f"The passed cause object '{cause_node}' does not exist.")
+            return None
+        elif (effect_node_name is None and effect_node_obj is None):
+            self.logger.error(f"The passed effect object '{effect_node}' does not exist.")
+            return None
+
         # Check if edge already exists
-        individual_names = [ind.name for ind in self.store.individuals()]
-        if name_for_edge in individual_names:
+        edge_existing = owlutils.get_entity_by_name(name_for_edge, self.store, suppress_warn=True)
+        if edge_existing is not None:
             self.logger.warning(f"Can't create CausalEdge {name_for_edge}. Name already taken.")
             return None
         # Check if both nodes exist, else: return None or force create node if specified
@@ -146,7 +182,7 @@ class Add():
         # (only if NOT of a type which is excluded from drawing CausalEdges in between)
         nodes_that_need_causal_node_type_added = []
         for node_name in (cause_node_name, effect_node_name):
-            if owlutils.is_instance_of_class(node_name, 'CausalNode', self.store, include_subtypes=True):
+            if owlutils.is_instance_of_type(node_name, 'CausalNode', self.store, include_subtypes=True):
                 pass
             else:
                 # Check if class_type is part of types prohibited for new nodes:
@@ -176,9 +212,9 @@ class Add():
         cause_node = owlutils.get_entity_by_name(cause_node_name, self.store, logger=self.logger)
         effect_node = owlutils.get_entity_by_name(effect_node_name, self.store, logger=self.logger)
         # Add additional properties to edge, depending on inputs
-        edge_properties_dict = dict(hasCause=[cause_node], hasEffect=[effect_node])
+        edge_properties_dict = dict(hasCause=cause_node, hasEffect=effect_node)
         if confidence is not None:
-            if 0.0 < confidence <= 1.0:
+            if 0.0 <= confidence <= 1.0:
                 edge_properties_dict['hasConfidence'] = confidence
             else:
                 self.logger.error(f"Cannot create CausalEdge between {cause_node_name} --> " +
@@ -186,7 +222,7 @@ class Add():
                                    "exceeds range [0,1]. ")
                 return None
         if time_lag_s is not None:
-            if time_lag_s > 0.0:
+            if time_lag_s >= 0.0:
                 edge_properties_dict['hasTimeLag'] = time_lag_s
             else:
                 self.logger.error(f"Cannot create CausalEdge between '{cause_node_name}--> " +
@@ -195,26 +231,28 @@ class Add():
                 return None
         # Create edge with objects
         if name_for_edge is not None:                    
-            edge_name = owlutils.create_individual_of_type(
+            new_edge_object = owlutils.create_individual_of_type(
                 class_of_individual="CausalEdge",
                 store=self.store,
                 name_for_individual=name_for_edge,
                 logger=self.logger,
+                validate_domain_range=validate_domain_range,
                 **edge_properties_dict, **kwargs
             )
         else:
-            edge_name = owlutils.create_individual_of_type(
+            new_edge_object = owlutils.create_individual_of_type(
                 class_of_individual="CausalEdge",
                 store=self.store,
                 name_for_individual=None,
                 logger=self.logger,
+                validate_domain_range=validate_domain_range,
                 **edge_properties_dict, **kwargs
             )
-        if edge_name is not None:
+        if new_edge_object is not None:
             self.logger.info(f"Created CausalEdge between cause '{cause_node_name}' and effect " +
                             f"'{effect_node_name}'")
             self.store.save()
         else:
             self.logger.warning("Creation failed. No Edge added between cause" +
                                 f"{cause_node_name} and effect {effect_node_name}")
-        return edge_name
+        return new_edge_object
