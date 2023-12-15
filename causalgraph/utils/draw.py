@@ -107,7 +107,7 @@ class Draw():
                     pass
                 # Append to html nodes list
                 nodes_html.append(node)
-            if individual_type == "CausalEdge":
+            if "CausalEdge" in individual_type:
                 edge = None
                 cause = graph_dict[individual].get("hasCause", None)
                 effect = graph_dict[individual].get("hasEffect", None)

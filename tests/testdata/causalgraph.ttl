@@ -10,7 +10,7 @@
 <http://iwu.fraunhofer.de/causalgraph> rdf:type owl:Ontology ;
                                         rdfs:comment "Causalgraph-ontology with basic concepts for CausalNodes and CausalEdges. Part of PyPi Package at https://pypi.org/project/causalgraph/"@en ;
                                         rdfs:label "causalgraph-ontology"@en ;
-                                        owl:versionInfo "0.14"@en .
+                                        owl:versionInfo "0.16"@en .
 
 #################################################################
 #    Object Properties
@@ -98,7 +98,7 @@ cg:hasConfidence rdf:type owl:DatatypeProperty ;
                                                    )
                             ] ;
                  owl:propertyDisjointWith cg:hasTimeLag ;
-                 rdfs:comment "Functional property of a CausalEdge. Measures the Creator's confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge's existence, while 0.0 means that this particular edge is not present."@en .
+                 rdfs:comment "Deprecated functional property of a CausalEdge. Measures the Creator's confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge's existence, while 0.0 means that this particular edge is not present."@en .
 
 [ rdf:type owl:Axiom ;
    owl:annotatedSource cg:hasConfidence ;
@@ -115,15 +115,55 @@ cg:hasConfidence rdf:type owl:DatatypeProperty ;
  ] .
 
 
+###  http://iwu.fraunhofer.de/causalgraph#causalPresenceIndex
+cg:causalPresenceIndex rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdf:type owl:FunctionalProperty ;
+                 rdfs:domain cg:CausalEdge ;
+                 rdfs:range xsd:double ,
+                            [ rdf:type rdfs:Datatype ;
+                              owl:onDatatype xsd:double ;
+                              owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:double
+                                                     ]
+                                                     [ xsd:maxInclusive "1.0"^^xsd:double
+                                                     ]
+                                                   )
+                            ] ;
+                 owl:propertyDisjointWith cg:hasTimeLag ;
+                 rdfs:comment "Measures in how many datasets the learning continous causal learning algorithm (CCL) found the described edge. A value of  1.0 represents found in all datasets, while 0.0 means that this particular edge was never found in a dataset and is probably not present."@en .
+
+[ rdf:type owl:Axiom ;
+   owl:annotatedSource cg:causalPresenceIndex ;
+   owl:annotatedProperty rdfs:range ;
+   owl:annotatedTarget [ rdf:type rdfs:Datatype ;
+                         owl:onDatatype xsd:double ;
+                         owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:double
+                                                ]
+                                                [ xsd:maxInclusive "1.0"^^xsd:double
+                                                ]
+                                              )
+                       ] ;
+   rdfs:comment "CausalPresenceIndex only allows values between 0.0 and 1.0."@en
+ ] .
+ 
+
+
 ###  http://iwu.fraunhofer.de/causalgraph#hasTimeLag
 cg:hasTimeLag rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
               rdf:type owl:FunctionalProperty ;
               rdfs:domain cg:CausalEdge ;
               rdfs:range xsd:double ,
+                         xsd:int ,
                          [ rdf:type rdfs:Datatype ;
                            owl:onDatatype xsd:double ;
                            owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:double
+                                                  ]
+                                                )
+                         ] ,
+                         [ rdf:type rdfs:Datatype ;
+                           owl:onDatatype xsd:int ;
+                           owl:withRestrictions ( [ xsd:minInclusive "0"^^xsd:int
                                                   ]
                                                 )
                          ] ;

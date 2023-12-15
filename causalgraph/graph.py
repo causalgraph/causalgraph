@@ -37,11 +37,13 @@ class Graph():
     def __init__(self, 
                 sql_db_filename: str = None,
                 sql_exclusive: bool = False,
-                log_file_dir: str = None,
                 logger_level: int = logging.WARNING,
+                log_file_handler: bool = False,
+                log_file_dir: str = None,
+                log_file_level: int = logging.DEBUG,
                 external_ontos: list[str] = None,
                 external_graph: Union[networkx.MultiDiGraph, tuple] = None,
-                validate_domain_range: bool = True
+                validate_domain_range: bool = False
     ) -> None:
         """Instantiates a Graph as the central object of causalgraph.
 
@@ -49,15 +51,19 @@ class Graph():
         :type sql_db_filename: str, optional
         :param sql_exclusive: if sql-db should be closed for parallel requests, defaults to False
         :type sql_exclusive: bool, optional
-        :param log_file_dir: path to the log-file directory, defaults to '{project_root}/data/logs/cg.json'
-        :type log_file_dir: str, optional
         :param logger_level: Verbosity level of logger
         :type logger_level: int
+        :param log_file_handler: If True, a file handler will be added to the logger, defaults to False
+        :type log_file_handler: bool, optional
+        :param log_file_dir: path to the log-file directory (needs log_file_handler =True), defaults to '{project_root}/data/logs/cg.json'
+        :type log_file_dir: str, optional
+        :param log_file_level: Verbosity level of logger for file handler (needs log_file_handler =True), defaults to logging.DEBUG
+        :type log_file_level: int, optional
         :param external_ontos: List of local Paths to file or URL to ontology in web.
         :type external_ontos: list[str], optional
         :param external_graph: NetworkX.MultiDiGraph or Tigramite Graph representation.
         :type external_graph: Union[networkx.MultiDiGraph, Tuple(list, dict, ndarray, ndarray, int)], optional
-        :param validate_domain_range: If True, all properties will be evaluated with domain and range before creating new individuals, defaults to True
+        :param validate_domain_range: If True, all properties will be evaluated with domain and range before creating new individuals, defaults to False
         :type validate_domain_range: bool, optional
         """
         # Store attributes if necessary
@@ -70,9 +76,9 @@ class Graph():
                                     f"expected location {self.core_onto_path}.")
         ## Initialize
         self.logger = init_logger(logger_name= "cg",
-                                  file_handler_level=logging.DEBUG,
+                                  file_handler=log_file_handler,
                                   console_handler_level=logger_level,
-                                  file_handler=True,
+                                  file_handler_level=log_file_level,
                                   elastic_style_json=True,
                                   log_file_dir=log_file_dir)
         self.store = self._init_store_backend_sqldb(self.sql_db_filename, sql_exclusive)
@@ -92,7 +98,7 @@ class Graph():
         ### Check if external graph (nx or tigra) was passed
         if external_graph is not None:
             self._init_external_graph(external_graph)
-        self.logger.info("Initialized the Causal Knowledge Graph.")
+        self.logger.debug("Initialized the Causal Knowledge Graph.")
 
         
     def _init_external_graph(self, external_graph: Union[networkx.MultiDiGraph, tuple]):
@@ -221,7 +227,7 @@ class Graph():
         return onto
 
 
-    def get_entity(self, name_of_entity: str, suppress_warn=False) -> owlready2.EntityClass:
+    def get_entity(self, name_of_entity: str, suppress_warn: bool = False) -> owlready2.Thing:
         """Returns an entity (class/property/individual) found under the given name.
         Returns none if no entity is found.
 
@@ -231,9 +237,9 @@ class Graph():
         :type suppress_warn: bool, optional
         :raises ValueError: if unexpectedly found more than one possible entity.
         :return: Entity Object (class/property/individual)
-        :rtype: owlready2.EntityClass
+        :rtype: owlready2.Thing
         """
-        return owlutils.get_entity_by_name(name_of_entity, self.store, self.logger, suppress_warn)
+        return owlutils.get_entity_by_name(name_of_entity, self.store, logger=self.logger, suppress_warn=suppress_warn)
 
 
     def delete(self):

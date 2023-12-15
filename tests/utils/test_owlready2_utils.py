@@ -10,6 +10,8 @@ import pytest
 import owlready2
 import os
 from pathlib import Path
+from enum import Enum
+
 # causalgraph imports
 from causalgraph import Graph
 import causalgraph.utils.owlready2_utils as owlutils
@@ -198,7 +200,6 @@ def test_get_entity_by_name(G: Graph):
     node_e_b_n = owlutils.get_entity_by_name(node.name, G.store)
     assert node_e_b_n is not None
 
-
 def test_entity_exists(G: Graph):
     """Test that checking if an entity exists works"""
     # Assert that the node exists after creation
@@ -222,7 +223,12 @@ def test_get_name_and_object(G: Graph):
     name_new, object_new = owlutils.get_name_and_object(object, G.store)
     assert name == name_new, "Did not find object via object"
     assert object == object_new, "Did not find object via object"
-
+    # Test via random object, which has .name attribute, should return None, None
+    class Color(Enum):
+        RED = 1
+    name_new, object_new = owlutils.get_name_and_object(Color.RED, G.store)
+    assert object_new is None, "Did not return 'None' as RETURNED OBJECT for random object (non knowledge graph individual)"
+    assert name_new is None, "Did not return 'None' as RETURNED NAME for random object (non knowledge graph individual)"
 
 def test_is_instance_of_type(G: Graph):
     """Test that checking if an individual belongs to a

@@ -25,7 +25,7 @@ class Add():
             self.logger = logger
         else:
             self.logger = init_logger("Add")
-        self.logger.info("Initialized the 'add' functionalities.")
+        self.logger.debug("Initialized the 'add' functionalities.")
         self.classes_prohibited_from_causal_connections = self._init_classes_prohibited_for_causal_connections()
 
 
@@ -196,10 +196,10 @@ class Add():
                                          "prohibited for CausalEdges.")
                     return None
         # Add the CausalNode Type if necessary:
+        causal_node_object = owlutils.get_entity_by_name("CausalNode", self.store)
         for node in nodes_that_need_causal_node_type_added:
             # Check if CausalNode is already within node types
             node_types = node.is_a
-            causal_node_object = owlutils.get_entity_by_name("CausalNode", self.store)
             if causal_node_object not in node_types:
                 # if yes: append
                 self.logger.debug(f"Node '{node_name}' does not inherit from 'CausalNode' yet." +
