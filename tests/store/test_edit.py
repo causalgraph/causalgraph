@@ -26,8 +26,8 @@ def fixture_testdata_dir() -> Path:
 
 @pytest.fixture(name="graph")
 def fixture_test_graph() -> Graph:
-    # Init graph
-    graph = Graph(sql_db_filename=None)
+    # Init graph with validation enabled
+    graph = Graph(sql_db_filename=None, validate_domain_range=True)
     # Init creators
     creator_node1 = graph.add.individual_of_type("Creator", name_for_individual="Creator1")
     creator_node2 = graph.add.individual_of_type("Creator", name_for_individual="Creator2")

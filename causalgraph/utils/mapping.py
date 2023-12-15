@@ -24,7 +24,7 @@ class Mapping():
             self.logger = logger
         else:
             self.logger = init_logger("Mapping")
-        self.logger.info("Initialized the 'mapping' functionalities.")
+        self.logger.debug("Initialized the 'mapping' functionalities.")
         self.causalgraph_object_properties = [prop.name for prop in list(self.graph.classes_onto.object_properties())] + ["comment"]
         self.causalgraph_data_properties = [prop.name for prop in list(self.graph.classes_onto.data_properties())]
         self.third_party_object_properties = []

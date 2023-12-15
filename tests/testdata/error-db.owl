@@ -23,7 +23,7 @@
     </Annotation>
     <Annotation>
         <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
-        <Literal>0.0.2</Literal>
+        <Literal>0.0.4</Literal>
     </Annotation>
     <Declaration>
         <Class IRI="#Environment"/>
@@ -57,6 +57,15 @@
     </Declaration>
     <Declaration>
         <DataProperty IRI="#contentLink"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#dataCompletionStatus"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#description"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#downTimeClassification"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#errorCode"/>
@@ -166,6 +175,18 @@
         <DataProperty IRI="#sqlDataProperties"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
+        <DataProperty IRI="#dataCompletionStatus"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#description"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#downTimeClassification"/>
+        <DataProperty IRI="#sqlDataProperties"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
         <DataProperty IRI="#errorCode"/>
         <DataProperty IRI="#sqlDataProperties"/>
     </SubDataPropertyOf>
@@ -224,6 +245,15 @@
         <DataProperty IRI="#contentLink"/>
     </FunctionalDataProperty>
     <FunctionalDataProperty>
+        <DataProperty IRI="#dataCompletionStatus"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#description"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#downTimeClassification"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
         <DataProperty IRI="#errorCode"/>
     </FunctionalDataProperty>
     <FunctionalDataProperty>
@@ -276,6 +306,18 @@
     <DataPropertyDomain>
         <DataProperty IRI="#contentLink"/>
         <Class IRI="#SqlTableEntry"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#dataCompletionStatus"/>
+        <Class IRI="#Error"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#description"/>
+        <Class IRI="#Error"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#downTimeClassification"/>
+        <Class IRI="#Error"/>
     </DataPropertyDomain>
     <DataPropertyDomain>
         <DataProperty IRI="#errorCode"/>
@@ -343,6 +385,26 @@
     </DataPropertyRange>
     <DataPropertyRange>
         <DataProperty IRI="#contentLink"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#dataCompletionStatus"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:int"/>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#int">0</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#maxInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#int">2</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#description"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#downTimeClassification"/>
         <Datatype abbreviatedIRI="xsd:string"/>
     </DataPropertyRange>
     <DataPropertyRange>
@@ -360,6 +422,10 @@
     <DataPropertyRange>
         <DataProperty IRI="#ignoredUntil"/>
         <Datatype abbreviatedIRI="xsd:dateTime"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#ignoredUntil"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
     </DataPropertyRange>
     <DataPropertyRange>
         <DataProperty IRI="#manufacturer"/>
@@ -457,6 +523,21 @@
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#contentLink</IRI>
         <Literal xml:lang="en">Conditional: Link to Rich-Text describing the sql-table-entry</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#dataCompletionStatus</IRI>
+        <Literal xml:lang="en">Information about the current documentation status within the database.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#description</IRI>
+        <Literal xml:lang="en">Description of an Error in DB.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#downTimeClassification</IRI>
+        <Literal xml:lang="en">Classifies the error into NoDowntime, PlannedDowntime and UnplannedDowntime.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>

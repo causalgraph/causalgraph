@@ -22,6 +22,7 @@ UTILS_LOGGER = init_logger("utils", console_handler_level=logging.WARNING)
 DEFAULT_PROPERTIES = ["comment", "isDefinedBy", "label", "seeAlso", "backwardCompatibleWith",
                      "deprecated", "incompatibleWith", "priorVersion", "versionInfo", 'type']
 # So far did not find a way on how to get the default properties from owlready2 https://owlready2.readthedocs.io/en/latest/annotations.html
+CACHED_IRIS = {} # Cache for iris to speed up repeated access
 ##################################################
 
 
@@ -186,15 +187,22 @@ def get_name_and_object(entity: Union[str, owlready2.Thing], store: owlready2.Wo
         object = get_entity_by_name(name_of_entity=name, store=store, logger=logger, suppress_warn=suppress_warn)
     # If entity is not a string, check if it has a .name attribute and then try to get the object from the store
     elif hasattr(entity, 'name'):
-        name = entity.name
-        object = get_entity_by_name(name_of_entity=name, store=store, logger=logger, suppress_warn=suppress_warn)
+        # Check if entity also has is_a attribute -> is yes: is valid entity in knowledge graph
+        if hasattr(entity, 'is_a'):
+            name = entity.name
+            object = entity
+        else:
+            # Call get_entity_by_name to have logging of what was searched (for better transparency/debugging)
+            object = get_entity_by_name(name_of_entity=entity.name, store=store, logger=logger, suppress_warn=suppress_warn)
+            if object is not None:
+                name = entity.name
     # Return resulting name and object or default to (None,None) if no case is matched
     return name, object
 
 
 def get_entity_by_name(name_of_entity: str, store: owlready2.World,
                        logger: Logger = UTILS_LOGGER, suppress_warn=False) -> owlready2.EntityClass:
-    """Returns entity (class/property/individual) found under given name.
+    """Returns entity (class/property/individual) found under given name. 
     Returns none if no entity is found.
 
     :param name_of_entity: Name of the entity to search for
@@ -235,11 +243,13 @@ def get_all_causalnodes(store: owlready2.World) -> list:
     :rtype: list
     """
     # SPARQL Query to get all CausalNodes and their SubClasses
-    causal_node_iri = get_entity_by_name("CausalNode", store, suppress_warn=True).iri
+    causal_node_iri = get_iri_from_cache_by_entity_name("CausalNode", store, suppress_warn=True)
     nodes_and_subclasses = list(store.sparql("""
         SELECT ?x
         { ?x a [rdfs:subClassOf* """ + f"<{causal_node_iri}>]" + " .}"
     ))
+    # TODO THIS UNPACKING NEEDS TO BE DONE -> Seperate update, because needs to be updated in kapp, faultgenerator etc. as well
+    # Unpack from format [[instance1],[instance2]..] to [instance1, instance2..]
     return nodes_and_subclasses
 
 
@@ -254,12 +264,33 @@ def get_all_causaledges(store: owlready2.World) -> list:
     :rtype: list
     """
     # SPARQL Query to get all CausalEdges and their SubClasses
-    causal_edge_iri = get_entity_by_name("CausalEdge", store, suppress_warn=True).iri
+    causal_edge_iri = get_iri_from_cache_by_entity_name("CausalEdge", store, suppress_warn=True)
     edges_and_subclasses = list(store.sparql("""
         SELECT ?x
         { ?x a [rdfs:subClassOf* """ + f"<{causal_edge_iri}>]" + " .}"
     ))
+    # TODO THIS UNPACKING NEEDS TO BE DONE -> Seperate update, because needs to be updated in kapp, faultgenerator etc. as well
+    # Unpack from format [[instance1],[instance2]..] to [instance1, instance2..]
     return edges_and_subclasses
+
+def get_edge_by_cause_and_effect(cause: Union[str, owlready2.Thing], effect: Union[str, owlready2.Thing], store: owlready2.World) -> list:
+    """Returns a list of all causal edges that have the given cause and effect."""
+    # Get Objects for cause and effect
+    cause_name, cause_obj = get_name_and_object(entity=cause, store=store)
+    effect_name, effect_obj = get_name_and_object(effect, store)
+    # Get Objects for relevant properties
+    causalEdge_type_iri = get_iri_from_cache_by_entity_name("CausalEdge", store, suppress_warn=True)
+    hasCause_iri = get_iri_from_cache_by_entity_name("hasCause", store, suppress_warn=True)
+    hasEffect_iri = get_iri_from_cache_by_entity_name("hasEffect", store, suppress_warn=True)
+    # Use Path expressions to include subtypes
+    causalEdges = store.sparql("""
+        SELECT DISTINCT ?x
+        { ?x a/rdfs:subClassOf* """ + f"<{causalEdge_type_iri}> ;" +
+             f"<{hasCause_iri}> <{cause_obj.iri}> ;" +
+             f"<{hasEffect_iri}> <{effect_obj.iri}> ." +
+        "}")
+    # Unpack from format [[instance1],[instance2]..] to [instance1, instance2..]
+    return [causalEdge[0] for causalEdge in causalEdges]
 
 
 def get_subclasses(type: Union[str, owlready2.Thing], store: owlready2.World,
@@ -573,7 +604,7 @@ def _validate_target_in_range_of_prop(target: Union[str, owlready2.Thing], prop:
                 return _validate_targets_in_object_property_range(target, prop, store, logger=logger)
         elif is_functional is False: # Target should already be a list, as expected from _targets_in_object_property_range
             if type(target) != list:
-                logger.warning(f"Single Target '{target}' was given, but property '{prop_str}' is functional and expects a list of targets. Passs as [target].")
+                logger.warning(f"Single Target '{target}' was given, but property '{prop_str}' is not functional and expects a list of targets. Passs as [target].")
                 return False
             else:
                 return _validate_targets_in_object_property_range(target, prop, store, logger=logger)
@@ -817,3 +848,35 @@ def _determine_prop_type_and_if_functional(property: Union[str, owlready2.Thing]
     else:
         result_functional = False
     return result_type, result_functional
+
+### Functions for faster access to cached iris
+
+def get_iri_from_cache_by_entity_name(name: str, store: owlready2.World,
+                                       logger: Logger = UTILS_LOGGER, suppress_warn=False) -> str:
+    """Gets the iri of the entity with the given name from the cached iris.
+
+    :param name: Name of the entity to get the iri from 
+    :type name: str
+    :param store: Store in which to check for entity's existence
+    :type store: owlready2.World
+    :param logger: logger, defaults to UTILS_LOGGER
+    :type logger: Logger, optional
+    :param suppress_warn: Switch to suppress logging of warnings, defaults to False
+    :type suppress_warn: bool, optional
+    :return: Iri of the entity with the given name
+    :rtype: str
+    """
+    global CACHED_IRIS
+    # 1) First try to get iri directly from CACHED_IRIS
+    try:
+        iri = CACHED_IRIS[name]
+    # 2) If key error -> get entity by_name and add to cached entities (if not None)
+    except KeyError:
+        entity = get_entity_by_name(name, store, logger=logger, suppress_warn=suppress_warn)
+        if entity is None:
+            return None
+        else:
+            iri = entity.iri    
+            CACHED_IRIS[name] = iri
+    # 3) Return iri
+    return iri

@@ -2,11 +2,22 @@
 # Change Log
 
 All notable changes to this project will be documented in this file.
+
+## [0.1.1] - 2023-12-15
+
+### Added
+- utility function to get edge by cause and effect (get_edge_by_cause_and_effect())
+- CausalPresenceIndex as part of causalgraph.owl Ontology -> successor of "hasConfidence"
+
+### Changed
+- Removed unnecessary packages in requirements.txt and created seperate tests/requirements.txt
+- Improved Performance and stability of get_name_and_object
+- validation of properties now "False" as default 
+- Made usage of log_file_handler optional (default: False) = No log file will be created
+- Move Status messageges for init to debug
+
  
 ## [0.1.0] - 2023-07-10
- 
-Here we write upgrading notes for brands. It's a team effort to make them as
-straightforward as possible.
  
 ### Added
 

@@ -14,9 +14,9 @@ from causalgraph.utils.misc_utils import get_project_root
 
 
 def init_logger(logger_name: str,
-                file_handler_level= logging.DEBUG,
                 console_handler_level= logging.WARNING,
                 file_handler= False,
+                file_handler_level= logging.DEBUG,
                 elastic_style_json= True,
                 log_file_dir= None) -> logging.Logger:
     """Initializes a  logger named 'loggerName' with a file handler
@@ -26,12 +26,12 @@ def init_logger(logger_name: str,
 
     :param logger_name: Name of the logger
     :type logger_name: str
-    :param file_handler_leveL: Level for the logfile, defaults to logging.DEBUG
-    :type file_handler_leveL: logging Level, optional
     :param console_handler_level: Level for the console output, defaults to logging.ERROR
     :type console_handler_level: logging Level, optional
     :param file_handler: Switch to enable fileHandler, defaults to False
     :type file_handler: bool, optional
+    :param file_handler_leveL: Level for the logfile, defaults to logging.DEBUG
+    :type file_handler_leveL: logging Level, optional
     :param elastic_style_json: Switch to enable json logs formatted in elastic style, defaults to True
     :type elastic_style_json: bool, optional
     :param log_file_dir: Path to directory, where log-file should be kept if fileHandler=True,
@@ -42,7 +42,7 @@ def init_logger(logger_name: str,
     """
     # Init main module logger
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(console_handler_level)
 
     # Create human readable format
     format_str = '%(asctime)s %(levelname)-7s %(message)s [%(filename)s:%(lineno)d]'

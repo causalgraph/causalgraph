@@ -23,7 +23,7 @@
     </Annotation>
     <Annotation>
         <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
-        <Literal xml:lang="en">0.15</Literal>
+        <Literal xml:lang="en">0.16</Literal>
     </Annotation>
     <Declaration>
         <Class IRI="#CausalEdge"/>
@@ -99,6 +99,9 @@
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#isCausing"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#causalPresenceIndex"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#hasConfidence"/>
@@ -282,6 +285,10 @@
         <Class IRI="#CausalEdge"/>
     </ObjectPropertyRange>
     <SubDataPropertyOf>
+        <DataProperty IRI="#causalPresenceIndex"/>
+        <DataProperty abbreviatedIRI="owl:topDataProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
         <DataProperty IRI="#hasConfidence"/>
         <DataProperty abbreviatedIRI="owl:topDataProperty"/>
     </SubDataPropertyOf>
@@ -290,12 +297,19 @@
         <DataProperty abbreviatedIRI="owl:topDataProperty"/>
     </SubDataPropertyOf>
     <FunctionalDataProperty>
+        <DataProperty IRI="#causalPresenceIndex"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
         <DataProperty IRI="#hasConfidence"/>
     </FunctionalDataProperty>
     <FunctionalDataProperty>
         <DataProperty IRI="#hasTimeLag"/>
     </FunctionalDataProperty>
     <DataPropertyDomain>
+        <DataProperty IRI="#causalPresenceIndex"/>
+        <Class IRI="#CausalEdge"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
         <DataProperty IRI="#hasConfidence"/>
         <Class IRI="#CausalEdge"/>
     </DataPropertyDomain>
@@ -303,6 +317,26 @@
         <DataProperty IRI="#hasTimeLag"/>
         <Class IRI="#CausalEdge"/>
     </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#causalPresenceIndex"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <Annotation>
+            <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+            <Literal xml:lang="en">CausalPresenceIndex only allows values between 0.0 and 1.0.</Literal>
+        </Annotation>
+        <DataProperty IRI="#causalPresenceIndex"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:double"/>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#minInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#double">0.0</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="http://www.w3.org/2001/XMLSchema#maxInclusive">
+                <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#double">1.0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
     <DataPropertyRange>
         <DataProperty IRI="#hasConfidence"/>
         <Datatype abbreviatedIRI="xsd:double"/>
@@ -349,6 +383,10 @@
             </FacetRestriction>
         </DatatypeRestriction>
     </DataPropertyRange>
+    <DisjointDataProperties>
+        <DataProperty IRI="#causalPresenceIndex"/>
+        <DataProperty IRI="#hasTimeLag"/>
+    </DisjointDataProperties>
     <DisjointDataProperties>
         <DataProperty IRI="#hasConfidence"/>
         <DataProperty IRI="#hasTimeLag"/>
@@ -526,13 +564,18 @@ In future releases the graph will be further classified into Causal Graphical Mo
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#causalPresenceIndex</IRI>
+        <Literal xml:lang="en">Measures in how many datasets the learning continous causal learning algorithm (CCL) found the described edge. A value of  1.0 represents found in all datasets, while 0.0 means that this particular edge was never found in a dataset and is probably not present.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#hasCause</IRI>
         <Literal xml:lang="en">A CausalEdge can only have a single &apos;cause&apos; indicated via the functional &apos;hasCause&apos; property.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#hasConfidence</IRI>
-        <Literal xml:lang="en">Functional property of a CausalEdge. Measures the Creator&apos;s confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge&apos;s existence, while 0.0 means that this particular edge is not present.</Literal>
+        <Literal xml:lang="en">Deprecated functional property of a CausalEdge. Measures the Creator&apos;s confidence (e.g., a learning algorithm) in the presence of this CausalEdge. A value of  1.0 represents complete confidence in the edge&apos;s existence, while 0.0 means that this particular edge is not present.</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>

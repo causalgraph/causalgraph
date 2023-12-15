@@ -24,7 +24,7 @@ class Edit():
             self.logger = logger
         else:
             self.logger = init_logger("Edit")
-        self.logger.info("Initialized the 'edit' functionalities.")
+        self.logger.debug("Initialized the 'edit' functionalities.")
 
 
     @strict_types

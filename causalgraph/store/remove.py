@@ -25,7 +25,7 @@ class Remove():
             self.logger = logger
         else:
             self.logger = init_logger("Remove")
-        self.logger.info("Initialized the 'remove' functionalities.")
+        self.logger.debug("Initialized the 'remove' functionalities.")
 
 
     @strict_types
