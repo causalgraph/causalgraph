@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - CausalPresenceIndex as part of causalgraph.owl Ontology -> successor of "hasConfidence"
 
 ### Changed
+- Removed unnecessary packages in requirements.txt and created seperate tests/requirements.txt
 - Improved Performance and stability of get_name_and_object
 - validation of properties now "False" as default 
 - Made usage of log_file_handler optional (default: False) = No log file will be created
