@@ -163,7 +163,7 @@ def test_import_same_ontology_twice(test_graph: Graph, testdata_dir):
 
 def test_import_ontology_at_startup(testdata_dir: str):
     """Tests the import of ontologies when initializing a new Graph() object"""
-    external_ontos = [f"{testdata_dir}/faults.owl", f"{testdata_dir}/pizza.owl"]
+    external_ontos = [f"{testdata_dir}/faults.owl", f"{testdata_dir}/error-db.owl", f"{testdata_dir}/pizza.owl"]
     G_new = Graph(
         sql_db_filename=None,
         external_ontos=external_ontos

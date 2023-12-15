@@ -61,13 +61,19 @@ def fixture_test_graph_simple() -> Graph:
 
 @pytest.fixture(name="test_graph_third")
 def fixture_test_graph_third(testdata_dir) -> Graph:
-    external_ontos = [f"{testdata_dir}/faults.owl", f"{testdata_dir}/pizza.owl"]
+    external_ontos = [f"{testdata_dir}/faults.owl", f"{testdata_dir}/error-db.owl", f"{testdata_dir}/pizza.owl"]
     graph = Graph(sql_db_filename=None, external_ontos=external_ontos)
     graph.add.individual_of_type("Creator", name_for_individual='Creator_1')
     creator_1 = owl2utils.get_entity_by_name('Creator_1', graph.store)
+    graph.add.individual_of_type("Environment", name_for_individual='environment_1')
+    environment_1 = owl2utils.get_entity_by_name('environment_1', graph.store)
     graph.add.individual_of_type("Mushroom", name_for_individual='Mushroom_1', hasCreator=[creator_1])
     graph.add.individual_of_type("Mushroom", name_for_individual='Mushroom_2')
+    graph.add.individual_of_type("Error", name_for_individual='9801', hasEnvironment=environment_1, hasCreator=[creator_1], errorCode='9801', apiUrl='http://localhost:8080/db/Errors/9801', message='Fehlertext asdf asdf')
+    graph.add.individual_of_type("Error", name_for_individual='5800', errorCode='5800', apiUrl='http://localhost:8080/db/Errors/5800', message='asdf', comment=['test comment'])
+    graph.add.causal_edge('9801', '5800', "Error_Edge", hasCreator=[creator_1], confidence=0.9)
     graph.add.causal_edge('Mushroom_1', 'Mushroom_2', "Mushroom_Edge", time_lag_s=2.2, comment=['test'])
+    graph.add.causal_edge('9801', 'Mushroom_2', "Mushroom_2_9801_Edge", time_lag_s=2)
     return graph
 
 
