@@ -1,0 +1,8 @@
+# Requirements soley for testing
+flake8 
+pytest 
+pytest-cov
+# Packages only required in tets
+pandas==1.5.1
+dowhy==0.7.1
+deepdiff==6.2.1
